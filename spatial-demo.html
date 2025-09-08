@@ -122,6 +122,12 @@
             top: 0;
             right: 0;
             bottom: 0;
+            overflow: hidden;
+            cursor: grab;
+        }
+        
+        .spatial-canvas:active {
+            cursor: grabbing;
         }
 
         .info-panel {
@@ -208,11 +214,16 @@
             </button>
 
             <div class="controls">
-                <h4 style="margin: 0 0 10px 0; font-size: 14px;">Controls</h4>
+                <h4 style="margin: 0 0 10px 0; font-size: 14px;">Infinite Zoom Navigation</h4>
+                <button class="control-button" id="zoom-in">🔍 Zoom In (2x)</button>
+                <button class="control-button" id="zoom-out">🔍 Zoom Out (0.5x)</button>
+                <button class="control-button" id="reset-view">🎯 Reset View</button>
+                <button class="control-button" id="auto-explore">🚀 Auto Explore</button>
+                
+                <h4 style="margin: 20px 0 10px 0; font-size: 14px;">Cinematic Demos</h4>
                 <button class="control-button" id="play-all">▶ Play All Connections</button>
                 <button class="control-button" id="demo-movements">🎭 Demo Movement Types</button>
                 <button class="control-button" id="show-metrics">📊 Show Performance Metrics</button>
-                <button class="control-button" id="export-scenario">💾 Export Current Scenario</button>
                 <button class="control-button stop" id="stop-demo">⏹ Stop Demo</button>
             </div>
         </div>
@@ -249,9 +260,13 @@
         console.log('2. Create demo instance: new CinematicDemo({ container, showControls: true })');
         console.log('3. Load scenarios: demo.runScenario("Hero Journey", { autoPlay: true })');
         
-        // Mock demo functionality for HTML preview
+        // Spatial navigation state
         let currentScenario = null;
         let isPlaying = false;
+        let viewport = { x: 0, y: 0, zoom: 1 };
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let elements = [];
 
         // Add event listeners to buttons
         document.querySelectorAll('.scenario-button').forEach(button => {
@@ -263,23 +278,17 @@
                 const scenario = button.dataset.scenario;
                 currentScenario = scenario;
                 
-                // Update canvas content
-                const canvas = document.getElementById('spatial-canvas');
-                canvas.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 18px;">
-                        🎬 ${scenario} scenario loaded<br>
-                        <small style="font-size: 12px; opacity: 0.7; margin-top: 10px;">
-                            In the real implementation, this would show the spatial engine with cinematic transitions
-                        </small>
-                    </div>
-                `;
+                // Load scenario elements and render infinite zoom view
+                elements = getScenarioElements(scenario);
+                viewport = { x: 0, y: 0, zoom: 1 }; // Reset viewport
+                renderSpatialView();
                 
                 updateInfoPanel(scenario);
                 console.log(`📡 Loaded scenario: ${scenario}`);
             });
         });
 
-        document.getElementById('play-all').addEventListener('click', () => {
+        document.getElementById('play-all').addEventListener('click', async () => {
             if (!currentScenario) {
                 alert('Please select a scenario first');
                 return;
@@ -291,12 +300,11 @@
             document.body.classList.add('playing');
             console.log(`🎬 Playing all connections for: ${currentScenario}`);
             
-            // Simulate demo playback
-            setTimeout(() => {
-                isPlaying = false;
-                document.body.classList.remove('playing');
-                console.log('🎬 Demo sequence completed');
-            }, 5000);
+            await playScenarioAnimation(currentScenario);
+            
+            isPlaying = false;
+            document.body.classList.remove('playing');
+            console.log('🎬 Demo sequence completed');
         });
 
         document.getElementById('demo-movements').addEventListener('click', () => {
@@ -325,6 +333,56 @@
             console.log('⏹ Demo stopped');
         });
 
+        // Infinite zoom controls
+        document.getElementById('zoom-in').addEventListener('click', () => {
+            viewport.zoom *= 2;
+            viewport.zoom = Math.min(viewport.zoom, 16); // Max zoom
+            renderSpatialView();
+            console.log(`🔍 Zoomed in to ${viewport.zoom}x`);
+        });
+
+        document.getElementById('zoom-out').addEventListener('click', () => {
+            viewport.zoom /= 2;
+            viewport.zoom = Math.max(viewport.zoom, 0.125); // Min zoom
+            renderSpatialView();
+            console.log(`🔍 Zoomed out to ${viewport.zoom}x`);
+        });
+
+        document.getElementById('reset-view').addEventListener('click', () => {
+            viewport = { x: 0, y: 0, zoom: 1 };
+            renderSpatialView();
+            console.log('🎯 View reset');
+        });
+
+        document.getElementById('auto-explore').addEventListener('click', async () => {
+            if (elements.length === 0) return;
+            console.log('🚀 Starting auto exploration...');
+            
+            for (const element of elements) {
+                if (!isPlaying) break;
+                
+                // Pan to element
+                viewport.x = -element.x + 400; // Center in view
+                viewport.y = -element.y + 300;
+                renderSpatialView();
+                await delay(1000);
+                
+                // Zoom in
+                viewport.zoom = 2;
+                renderSpatialView();
+                await delay(1000);
+                
+                // Zoom out
+                viewport.zoom = 0.5;
+                renderSpatialView();
+                await delay(1000);
+            }
+            
+            // Reset
+            viewport = { x: 0, y: 0, zoom: 1 };
+            renderSpatialView();
+        });
+
         function updateInfoPanel(scenario) {
             const panel = document.getElementById('info-panel');
             const descriptions = {
@@ -347,6 +405,430 @@
                 </div>
             `;
         }
+
+        // Animation functions
+        async function playScenarioAnimation(scenario) {
+            const viewport = document.getElementById('spatial-viewport');
+            if (!viewport) return;
+
+            const elements = viewport.querySelectorAll('.spatial-element');
+            const connections = viewport.querySelectorAll('.connection-line');
+            
+            // Reset all elements
+            elements.forEach(el => {
+                el.style.opacity = '0.3';
+                el.style.transform = 'scale(0.8)';
+            });
+            
+            connections.forEach(conn => {
+                conn.style.opacity = '0.1';
+            });
+
+            // Animate elements in sequence
+            for (let i = 0; i < elements.length; i++) {
+                if (!isPlaying) break;
+                
+                const element = elements[i];
+                const movementType = getMovementTypeForScenario(scenario);
+                
+                // Highlight current element
+                element.style.opacity = '1';
+                element.style.transform = getTransformForMovement(movementType, i, elements.length);
+                element.style.border = '3px solid #fff';
+                element.style.boxShadow = '0 0 20px rgba(255,255,255,0.6)';
+                
+                // Animate corresponding connections
+                if (i < connections.length) {
+                    connections[i].style.opacity = '1';
+                    connections[i].style.animation = 'connection-flow 1s ease-in-out';
+                }
+                
+                // Add spatial audio effect
+                playAudioCue(movementType, i);
+                
+                console.log(`🎬 Animating: ${element.textContent} (${movementType} style)`);
+                
+                // Wait based on movement type
+                await delay(getDelayForMovement(movementType));
+                
+                // Reset highlight but keep visible
+                element.style.border = '2px solid rgba(255,255,255,0.3)';
+                element.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+            }
+
+            // Final flourish - show all connections
+            connections.forEach(conn => {
+                conn.style.opacity = '0.7';
+                conn.style.animation = 'pulse 2s infinite';
+            });
+        }
+
+        function getMovementTypeForScenario(scenario) {
+            const movementMap = {
+                'Hero Journey': 'dramatic-zoom',
+                'Spiral Story': 'cinematic-reveal',
+                'Timeline': 'professional-focus',
+                'Hub and Spoke': 'playful-bounce',
+                'Exploration Grid': 'playful-bounce',
+                'Presentation': 'professional-focus',
+                'User Journey': 'documentary-pan'
+            };
+            return movementMap[scenario] || 'professional-focus';
+        }
+
+        function getTransformForMovement(movementType, index, total) {
+            switch(movementType) {
+                case 'dramatic-zoom':
+                    return `scale(1.2) rotate(${index * 2}deg)`;
+                case 'cinematic-reveal':
+                    return `scale(1.1) translateY(-10px)`;
+                case 'professional-focus':
+                    return `scale(1.05)`;
+                case 'playful-bounce':
+                    return `scale(1.15) translateY(${Math.sin(index) * 5}px)`;
+                case 'documentary-pan':
+                    return `scale(1.02) translateX(${index % 2 === 0 ? 5 : -5}px)`;
+                default:
+                    return 'scale(1)';
+            }
+        }
+
+        function getDelayForMovement(movementType) {
+            const delays = {
+                'dramatic-zoom': 1200,
+                'cinematic-reveal': 1500,
+                'professional-focus': 800,
+                'playful-bounce': 600,
+                'documentary-pan': 1000
+            };
+            return delays[movementType] || 1000;
+        }
+
+        function playAudioCue(movementType, index) {
+            // Create a simple audio frequency based on movement type and index
+            const frequencies = {
+                'dramatic-zoom': 220 + index * 110,
+                'cinematic-reveal': 330 + index * 55,
+                'professional-focus': 440 + index * 44,
+                'playful-bounce': 550 + index * 33,
+                'documentary-pan': 260 + index * 65
+            };
+            
+            const freq = frequencies[movementType] || 440;
+            
+            // Simple Web Audio API tone
+            if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                } catch (e) {
+                    console.log('Audio context not available');
+                }
+            }
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Create visual scenario layouts
+        function createScenarioLayout(scenario) {
+            switch(scenario) {
+                case 'Hero Journey':
+                    return createHeroJourneyLayout();
+                case 'Spiral Story':
+                    return createSpiralLayout();
+                case 'Timeline':
+                    return createTimelineLayout();
+                case 'Hub and Spoke':
+                    return createHubSpokeLayout();
+                case 'Exploration Grid':
+                    return createGridLayout();
+                case 'Presentation':
+                    return createPresentationLayout();
+                case 'User Journey':
+                    return createUserJourneyLayout();
+                default:
+                    return '<div class="loading">Select a scenario to begin...</div>';
+            }
+        }
+
+        function createHeroJourneyLayout() {
+            const elements = [
+                { name: 'Hero Home', x: 50, y: 300, color: '#4ECDC4' },
+                { name: 'Call to Adventure', x: 200, y: 200, color: '#45B7D1' },
+                { name: 'Mentor Appears', x: 400, y: 150, color: '#96CEB4' },
+                { name: 'Cross Threshold', x: 600, y: 100, color: '#FFEAA7' },
+                { name: 'Tests & Trials', x: 800, y: 80, color: '#FF6B6B' },
+                { name: 'Final Battle', x: 1000, y: 50, color: '#DDA0DD' },
+                { name: 'Return Home', x: 1200, y: 200, color: '#98FB98' }
+            ];
+            return createElementsHTML(elements, true);
+        }
+
+        function createSpiralLayout() {
+            const elements = [];
+            const centerX = 400, centerY = 300;
+            const points = ['Introduction', 'Rising Action', 'Complication', 'Development', 'Climax', 'Resolution'];
+            const colors = ['#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#FF6B6B', '#DDA0DD'];
+            
+            for(let i = 0; i < points.length; i++) {
+                const angle = (i / points.length) * Math.PI * 4; // 2 full rotations
+                const radius = 50 + i * 40;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                elements.push({ name: points[i], x, y, color: colors[i] });
+            }
+            return createElementsHTML(elements, true);
+        }
+
+        function createTimelineLayout() {
+            const elements = [
+                { name: '2020: Genesis', x: 100, y: 250, color: '#4ECDC4' },
+                { name: '2021: Growth', x: 300, y: 250, color: '#45B7D1' },
+                { name: '2022: Expansion', x: 500, y: 250, color: '#96CEB4' },
+                { name: '2023: Innovation', x: 700, y: 250, color: '#FFEAA7' },
+                { name: '2024: Future', x: 900, y: 250, color: '#FF6B6B' }
+            ];
+            return createElementsHTML(elements, true, 'linear');
+        }
+
+        function createHubSpokeLayout() {
+            const hub = { name: 'Central Hub', x: 500, y: 300, color: '#DDA0DD', size: 'large' };
+            const spokes = [
+                { name: 'Feature A', x: 300, y: 150, color: '#4ECDC4' },
+                { name: 'Feature B', x: 700, y: 150, color: '#45B7D1' },
+                { name: 'Feature C', x: 200, y: 400, color: '#96CEB4' },
+                { name: 'Feature D', x: 800, y: 400, color: '#FFEAA7' },
+                { name: 'Feature E', x: 500, y: 500, color: '#FF6B6B' }
+            ];
+            return createElementsHTML([hub, ...spokes], true, 'radial');
+        }
+
+        function createGridLayout() {
+            const elements = [];
+            const items = ['Gallery Item 1', 'Gallery Item 2', 'Gallery Item 3', 'Gallery Item 4', 'Gallery Item 5', 'Gallery Item 6'];
+            const colors = ['#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#FF6B6B', '#DDA0DD'];
+            
+            for(let i = 0; i < 6; i++) {
+                const row = Math.floor(i / 3);
+                const col = i % 3;
+                elements.push({
+                    name: items[i],
+                    x: 200 + col * 250,
+                    y: 200 + row * 200,
+                    color: colors[i]
+                });
+            }
+            return createElementsHTML(elements, false);
+        }
+
+        function createPresentationLayout() {
+            const elements = [
+                { name: 'Title Slide', x: 100, y: 200, color: '#4ECDC4' },
+                { name: 'Agenda', x: 300, y: 200, color: '#45B7D1' },
+                { name: 'Problem Statement', x: 500, y: 200, color: '#96CEB4' },
+                { name: 'Solution Overview', x: 700, y: 200, color: '#FFEAA7' },
+                { name: 'Implementation', x: 900, y: 200, color: '#FF6B6B' },
+                { name: 'Results', x: 1100, y: 200, color: '#DDA0DD' },
+                { name: 'Q&A', x: 1300, y: 200, color: '#98FB98' }
+            ];
+            return createElementsHTML(elements, true, 'linear');
+        }
+
+        function createUserJourneyLayout() {
+            const elements = [
+                { name: 'Landing Page', x: 100, y: 250, color: '#4ECDC4' },
+                { name: 'Sign Up', x: 300, y: 200, color: '#45B7D1' },
+                { name: 'Onboarding', x: 500, y: 300, color: '#96CEB4' },
+                { name: 'Main Dashboard', x: 700, y: 180, color: '#FFEAA7' },
+                { name: 'Feature Discovery', x: 900, y: 280, color: '#FF6B6B' },
+                { name: 'Success State', x: 1100, y: 200, color: '#DDA0DD' }
+            ];
+            return createElementsHTML(elements, true, 'flow');
+        }
+
+        function createElementsHTML(elements, showConnections = false, connectionType = 'default') {
+            let html = '';
+            
+            // Add connections first (so they appear behind elements)
+            if (showConnections && elements.length > 1) {
+                html += createConnectionsHTML(elements, connectionType);
+            }
+            
+            // Add elements
+            elements.forEach((element, index) => {
+                const size = element.size === 'large' ? 120 : 80;
+                const fontSize = element.size === 'large' ? '14px' : '11px';
+                html += `
+                    <div class="spatial-element" 
+                         data-index="${index}"
+                         style="
+                             position: absolute; 
+                             left: ${element.x - size/2}px; 
+                             top: ${element.y - size/2}px; 
+                             width: ${size}px; 
+                             height: ${size}px; 
+                             background: ${element.color}; 
+                             border: 2px solid rgba(255,255,255,0.3);
+                             border-radius: 8px; 
+                             display: flex; 
+                             align-items: center; 
+                             justify-content: center; 
+                             color: white; 
+                             font-size: ${fontSize}; 
+                             font-weight: 600; 
+                             text-align: center; 
+                             cursor: pointer;
+                             transition: all 0.3s ease;
+                             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                             z-index: 10;
+                         "
+                         onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.5)';"
+                         onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
+                         onclick="highlightElement(this, ${index})">
+                        ${element.name}
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+
+        function createConnectionsHTML(elements, type) {
+            let html = '';
+            
+            if (type === 'radial' && elements.length > 1) {
+                // Hub and spoke connections
+                const hub = elements[0];
+                for (let i = 1; i < elements.length; i++) {
+                    html += createConnectionLine(hub, elements[i]);
+                }
+            } else if (type === 'linear' || type === 'flow') {
+                // Sequential connections
+                for (let i = 0; i < elements.length - 1; i++) {
+                    html += createConnectionLine(elements[i], elements[i + 1]);
+                }
+            } else {
+                // Default sequential connections
+                for (let i = 0; i < elements.length - 1; i++) {
+                    html += createConnectionLine(elements[i], elements[i + 1]);
+                }
+            }
+            
+            return html;
+        }
+
+        function createConnectionLine(from, to) {
+            const x1 = from.x;
+            const y1 = from.y;
+            const x2 = to.x;
+            const y2 = to.y;
+            
+            const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            
+            return `
+                <div class="connection-line" style="
+                    position: absolute;
+                    left: ${x1}px;
+                    top: ${y1}px;
+                    width: ${length}px;
+                    height: 2px;
+                    background: linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+                    transform-origin: 0 50%;
+                    transform: rotate(${angle}deg);
+                    z-index: 1;
+                    opacity: 0.7;
+                    will-change: transform;
+                "></div>
+            `;
+        }
+
+        function highlightElement(element, index) {
+            // Remove previous highlights
+            document.querySelectorAll('.spatial-element').forEach(el => {
+                el.style.border = '2px solid rgba(255,255,255,0.3)';
+            });
+            
+            // Highlight clicked element
+            element.style.border = '3px solid #fff';
+            
+            // Add ripple effect
+            const ripple = document.createElement('div');
+            ripple.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 20px;
+                height: 20px;
+                background: rgba(255,255,255,0.6);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+                z-index: 20;
+            `;
+            
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+            
+            console.log(`🎯 Element clicked: ${element.textContent} (index: ${index})`);
+        }
+
+        // Add animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: translate(-50%, -50%) scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes connection-flow {
+                0% { 
+                    background: linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.2), rgba(255,255,255,0.2));
+                    transform: scaleX(0);
+                    transform-origin: 0 50%;
+                }
+                50% {
+                    background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,1), rgba(255,255,255,0.8));
+                    transform: scaleX(1);
+                }
+                100% {
+                    background: linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+                    transform: scaleX(1);
+                }
+            }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 0.7; }
+                50% { opacity: 1; }
+            }
+            
+            .spatial-element {
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+            }
+            
+            .connection-line {
+                transition: none !important;
+            }
+        `;
+        document.head.appendChild(style);
 
         // Show initial info
         updateInfoPanel('Demo');

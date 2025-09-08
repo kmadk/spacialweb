@@ -108,7 +108,7 @@ export class PenpotParser {
     };
 
     if (rawElement.shapes?.length > 0) {
-      element.children = rawElement.shapes.map(shape => this.transformElement(shape));
+      element.children = rawElement.shapes.map((shape: any) => this.transformElement(shape));
     }
 
     if (rawElement.interactions?.length > 0) {
