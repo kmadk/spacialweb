@@ -18,7 +18,7 @@
 
 ### 📚 Documentation
 - [x] **CINEMATIC_SYSTEM.md** - Comprehensive 50-page documentation
-- [x] **cinematic-demo.html** - Interactive demo with UI controls
+- [x] **spatial-demo.html** - Interactive demo with UI controls
 - [x] **Code comments** - Extensive JSDoc documentation throughout
 - [x] **Type definitions** - Complete TypeScript interfaces and types
 
@@ -40,7 +40,7 @@
 - [ ] **Install dependencies** - `pnpm install` in root directory
 - [ ] **Run existing tests** - Ensure no regressions in core functionality
 - [ ] **Manual smoke test** - Basic functionality verification
-- [ ] **Demo verification** - Test cinematic-demo.html in browser
+- [ ] **Demo verification** - Test spatial-demo.html in browser
 
 ### 📋 Final Preparation
 - [ ] **Update CHANGELOG.md** - Document the cinematic system addition

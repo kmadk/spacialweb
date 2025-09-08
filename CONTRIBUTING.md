@@ -46,7 +46,7 @@ pnpm dev
 ./demo.sh
 
 # Or open directly
-open cinematic-demo.html
+open spatial-demo.html
 ```
 
 ## 🎭 Areas for Contribution

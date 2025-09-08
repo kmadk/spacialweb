@@ -5,7 +5,7 @@
 ### 1. **Instant Demo (No Installation)**
 ```bash
 # Just open the HTML file in your browser
-open cinematic-demo.html
+open spatial-demo.html
 
 # Or use our demo launcher
 ./demo.sh
@@ -182,7 +182,7 @@ Watch for these real-time indicators:
 
 ### **Demo Won't Load**
 - **Check Browser**: Requires modern browser with WebGL support
-- **File Location**: Ensure cinematic-demo.html is in root directory
+- **File Location**: Ensure spatial-demo.html is in root directory
 - **Console Errors**: Open browser dev tools to check for errors
 
 ### **No Audio**  
