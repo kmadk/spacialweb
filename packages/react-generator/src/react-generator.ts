@@ -8,11 +8,9 @@ import type {
 } from '@fir/penpot-parser';
 import type {
   GenerationOptions,
-  ComponentOptions,
   GeneratedProject,
   GeneratedFile,
   ProcessedAsset,
-  ProjectMetadata,
   TemplateData,
   SpatialWorldConfig,
   SpatialRoute,
@@ -179,7 +177,7 @@ ${this.generateElementsJSX(component.elements, 6)}
   style={${JSON.stringify(styles)}}
   ${interactions}
 >
-  ${element.data?.text || element.name}
+  ${element.data?.fallback || element.name}
 </span>`;
   }
 
@@ -201,7 +199,7 @@ ${element.children ? `>\n${this.generateElementsJSX(element.children, 2)}\n</${t
 
     return `<img
   id="${element.id}"
-  src="${element.data?.src || '/placeholder.jpg'}"
+  src="${element.data?.fallback || '/placeholder.jpg'}"
   alt="${element.name}"
   style={${JSON.stringify(styles)}}
   ${interactions}
@@ -312,7 +310,7 @@ ${element.children ? this.generateElementsJSX(element.children, indent + 2) : ''
     }
   }
 
-  private generateImports(elements: PenpotElement[], options: GenerationOptions): string[] {
+  private generateImports(elements: PenpotElement[]): string[] {
     const imports: string[] = [];
     
     // Add component imports based on element types
@@ -348,8 +346,8 @@ ${element.children ? this.generateElementsJSX(element.children, indent + 2) : ''
 
   private extractPropsFromElements(elements: PenpotElement[], props: Record<string, any>): void {
     for (const element of elements) {
-      if (element.data?.props) {
-        Object.assign(props, element.data.props);
+      if (element.data?.fallback && typeof element.data.fallback === 'object') {
+        Object.assign(props, element.data.fallback);
       }
 
       if (element.children) {

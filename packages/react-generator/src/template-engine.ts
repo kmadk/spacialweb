@@ -1,4 +1,4 @@
-import type { TemplateData, GeneratedFile } from './types.js';
+import type { TemplateData } from './types.js';
 
 export class TemplateEngine {
   generateComponent(data: TemplateData): string {

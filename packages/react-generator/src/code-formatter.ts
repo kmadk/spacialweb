@@ -14,7 +14,7 @@ export class CodeFormatter {
   formatSync(code: string, type: 'typescript' | 'css' | 'json' | 'html' = 'typescript'): string {
     try {
       const options = this.getFormatterOptions(type);
-      return prettier.format(code, options);
+      return prettier.formatSync ? prettier.formatSync(code, options) : code;
     } catch (error) {
       console.warn('Failed to format code:', error);
       return code;
@@ -77,7 +77,8 @@ export class CodeFormatter {
         trailingComma: 'none' as const,
       };
 
-      return prettier.format(code, options)
+      const formatted = prettier.formatSync ? prettier.formatSync(code, options) : code;
+      return formatted
         .replace(/\s+/g, ' ')
         .replace(/;\s/g, ';')
         .trim();

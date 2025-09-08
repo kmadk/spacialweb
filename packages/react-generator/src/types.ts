@@ -1,4 +1,3 @@
-import type { PenpotFile, PenpotPage, PenpotElement, PenpotComponent } from '@fir/penpot-parser';
 
 export interface GenerationOptions {
   projectName?: string;

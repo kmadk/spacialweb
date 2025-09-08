@@ -226,4 +226,184 @@ export class ViewportCulling3D {
       const occlusionFactor = this.calculateOcclusionFactor(element, elements.slice(0, i));
       element.occlusionFactor = occlusionFactor;
       element.isOccluded = occlusionFactor > 0.8; // 80% occluded = considered occluded
-    }\n  }\n  \n  /**\n   * Build spatial grid for occlusion testing optimization\n   */\n  private buildOcclusionGrid(elements: OcclusionInfo[]): void {\n    this.occlusionGrid.clear();\n    \n    for (const elementInfo of elements) {\n      const bounds = elementInfo.bounds3D;\n      \n      // Calculate grid cells this element spans\n      const minGridX = Math.floor(bounds.x / this.gridSize);\n      const maxGridX = Math.floor((bounds.x + bounds.width) / this.gridSize);\n      const minGridY = Math.floor(bounds.y / this.gridSize);\n      const maxGridY = Math.floor((bounds.y + bounds.height) / this.gridSize);\n      \n      for (let gx = minGridX; gx <= maxGridX; gx++) {\n        for (let gy = minGridY; gy <= maxGridY; gy++) {\n          const gridKey = `${gx},${gy}`;\n          if (!this.occlusionGrid.has(gridKey)) {\n            this.occlusionGrid.set(gridKey, []);\n          }\n          this.occlusionGrid.get(gridKey)!.push(elementInfo.element);\n        }\n      }\n    }\n  }\n  \n  /**\n   * Calculate occlusion factor for an element\n   */\n  private calculateOcclusionFactor(testElement: OcclusionInfo, occluders: OcclusionInfo[]): number {\n    let totalOcclusion = 0;\n    const testBounds = testElement.bounds3D;\n    \n    // Get potential occluders from grid cells\n    const potentialOccluders = this.getPotentialOccluders(testBounds);\n    \n    for (const occluderInfo of occluders) {\n      if (!potentialOccluders.includes(occluderInfo.element)) {\n        continue;\n      }\n      \n      const occluder = occluderInfo.bounds3D;\n      \n      // Check if occluder is in front of test element\n      if (occluder.zMax >= testBounds.zMin) {\n        continue;\n      }\n      \n      // Calculate overlap area\n      const overlapArea = this.calculateOverlapArea(testBounds, occluder);\n      const testElementArea = testBounds.width * testBounds.height;\n      \n      if (testElementArea > 0) {\n        const occlusionRatio = overlapArea / testElementArea;\n        \n        // Consider opacity of occluder\n        const occluderOpacity = occluderInfo.element.data?.styles?.opacity ?? 1;\n        totalOcclusion += occlusionRatio * occluderOpacity;\n      }\n    }\n    \n    return Math.min(totalOcclusion, 1); // Clamp to maximum occlusion of 100%\n  }\n  \n  /**\n   * Get potential occluders from grid\n   */\n  private getPotentialOccluders(bounds: BoundingBox3D): SpatialElement[] {\n    const elements = new Set<SpatialElement>();\n    \n    const minGridX = Math.floor(bounds.x / this.gridSize);\n    const maxGridX = Math.floor((bounds.x + bounds.width) / this.gridSize);\n    const minGridY = Math.floor(bounds.y / this.gridSize);\n    const maxGridY = Math.floor((bounds.y + bounds.height) / this.gridSize);\n    \n    for (let gx = minGridX; gx <= maxGridX; gx++) {\n      for (let gy = minGridY; gy <= maxGridY; gy++) {\n        const gridKey = `${gx},${gy}`;\n        const gridElements = this.occlusionGrid.get(gridKey) ?? [];\n        gridElements.forEach(element => elements.add(element));\n      }\n    }\n    \n    return Array.from(elements);\n  }\n  \n  /**\n   * Calculate overlap area between two 2D rectangles\n   */\n  private calculateOverlapArea(rect1: BoundingBox, rect2: BoundingBox): number {\n    const left = Math.max(rect1.x, rect2.x);\n    const right = Math.min(rect1.x + rect1.width, rect2.x + rect2.width);\n    const top = Math.max(rect1.y, rect2.y);\n    const bottom = Math.min(rect1.y + rect1.height, rect2.y + rect2.height);\n    \n    if (left < right && top < bottom) {\n      return (right - left) * (bottom - top);\n    }\n    \n    return 0;\n  }\n  \n  /**\n   * Fallback 2D culling for backward compatibility\n   */\n  private cull2D(elements: SpatialElement[], viewport: Viewport): {\n    visibleElements: SpatialElement[];\n    culledElements: SpatialElement[];\n    occlusionInfo: OcclusionInfo[];\n    statistics: {\n      totalElements: number;\n      frustumCulled: number;\n      occlusionCulled: number;\n      visibleElements: number;\n    };\n  } {\n    const worldWidth = viewport.width / viewport.zoom;\n    const worldHeight = viewport.height / viewport.zoom;\n    const viewportBounds = {\n      x: viewport.x - worldWidth / 2,\n      y: viewport.y - worldHeight / 2,\n      width: worldWidth,\n      height: worldHeight,\n    };\n    \n    const visibleElements: SpatialElement[] = [];\n    const culledElements: SpatialElement[] = [];\n    \n    for (const element of elements) {\n      if (this.boundsIntersect(element.bounds, viewportBounds)) {\n        visibleElements.push(element);\n      } else {\n        culledElements.push(element);\n      }\n    }\n    \n    return {\n      visibleElements,\n      culledElements,\n      occlusionInfo: [],\n      statistics: {\n        totalElements: elements.length,\n        frustumCulled: culledElements.length,\n        occlusionCulled: 0,\n        visibleElements: visibleElements.length,\n      },\n    };\n  }\n  \n  private boundsIntersect(bounds1: BoundingBox, bounds2: BoundingBox): boolean {\n    return !(\n      bounds1.x + bounds1.width < bounds2.x ||\n      bounds1.x > bounds2.x + bounds2.width ||\n      bounds1.y + bounds1.height < bounds2.y ||\n      bounds1.y > bounds2.y + bounds2.height\n    );\n  }\n  \n  /**\n   * Configuration methods\n   */\n  setFrustumCullDistance(distance: number): void {\n    this.frustumCullDistance = distance;\n  }\n  \n  setOcclusionTestDistance(distance: number): void {\n    this.occlusionTestDistance = distance;\n  }\n  \n  setLODDistanceThresholds(thresholds: number[]): void {\n    this.lodDistanceThresholds = [...thresholds].sort((a, b) => a - b);\n  }\n  \n  setGridSize(size: number): void {\n    this.gridSize = size;\n  }\n}
+    }
+  }
+  
+  /**
+   * Build spatial grid for occlusion testing optimization
+   */
+  private buildOcclusionGrid(elements: OcclusionInfo[]): void {
+    this.occlusionGrid.clear();
+    
+    for (const elementInfo of elements) {
+      const bounds = elementInfo.bounds3D;
+      
+      // Calculate grid cells this element spans
+      const minGridX = Math.floor(bounds.x / this.gridSize);
+      const maxGridX = Math.floor((bounds.x + bounds.width) / this.gridSize);
+      const minGridY = Math.floor(bounds.y / this.gridSize);
+      const maxGridY = Math.floor((bounds.y + bounds.height) / this.gridSize);
+      
+      for (let gx = minGridX; gx <= maxGridX; gx++) {
+        for (let gy = minGridY; gy <= maxGridY; gy++) {
+          const gridKey = `${gx},${gy}`;
+          if (!this.occlusionGrid.has(gridKey)) {
+            this.occlusionGrid.set(gridKey, []);
+          }
+          this.occlusionGrid.get(gridKey)!.push(elementInfo.element);
+        }
+      }
+    }
+  }
+  
+  /**
+   * Calculate occlusion factor for an element
+   */
+  private calculateOcclusionFactor(testElement: OcclusionInfo, occluders: OcclusionInfo[]): number {
+    let totalOcclusion = 0;
+    const testBounds = testElement.bounds3D;
+    
+    // Get potential occluders from grid cells
+    const potentialOccluders = this.getPotentialOccluders(testBounds);
+    
+    for (const occluderInfo of occluders) {
+      if (!potentialOccluders.includes(occluderInfo.element)) {
+        continue;
+      }
+      
+      const occluder = occluderInfo.bounds3D;
+      
+      // Check if occluder is in front of test element
+      if (occluder.zMax >= testBounds.zMin) {
+        continue;
+      }
+      
+      // Calculate overlap area
+      const overlapArea = this.calculateOverlapArea(testBounds, occluder);
+      const testElementArea = testBounds.width * testBounds.height;
+      
+      if (testElementArea > 0) {
+        const occlusionRatio = overlapArea / testElementArea;
+        
+        // Consider opacity of occluder
+        const occluderOpacity = occluderInfo.element.data?.styles?.opacity ?? 1;
+        totalOcclusion += occlusionRatio * occluderOpacity;
+      }
+    }
+    
+    return Math.min(totalOcclusion, 1); // Clamp to maximum occlusion of 100%
+  }
+  
+  /**
+   * Get potential occluders from grid
+   */
+  private getPotentialOccluders(bounds: BoundingBox3D): SpatialElement[] {
+    const elements = new Set<SpatialElement>();
+    
+    const minGridX = Math.floor(bounds.x / this.gridSize);
+    const maxGridX = Math.floor((bounds.x + bounds.width) / this.gridSize);
+    const minGridY = Math.floor(bounds.y / this.gridSize);
+    const maxGridY = Math.floor((bounds.y + bounds.height) / this.gridSize);
+    
+    for (let gx = minGridX; gx <= maxGridX; gx++) {
+      for (let gy = minGridY; gy <= maxGridY; gy++) {
+        const gridKey = `${gx},${gy}`;
+        const gridElements = this.occlusionGrid.get(gridKey) ?? [];
+        gridElements.forEach(element => elements.add(element));
+      }
+    }
+    
+    return Array.from(elements);
+  }
+  
+  /**
+   * Calculate overlap area between two 2D rectangles
+   */
+  private calculateOverlapArea(rect1: BoundingBox, rect2: BoundingBox): number {
+    const left = Math.max(rect1.x, rect2.x);
+    const right = Math.min(rect1.x + rect1.width, rect2.x + rect2.width);
+    const top = Math.max(rect1.y, rect2.y);
+    const bottom = Math.min(rect1.y + rect1.height, rect2.y + rect2.height);
+    
+    if (left < right && top < bottom) {
+      return (right - left) * (bottom - top);
+    }
+    
+    return 0;
+  }
+  
+  /**
+   * Fallback 2D culling for backward compatibility
+   */
+  private cull2D(elements: SpatialElement[], viewport: Viewport): {
+    visibleElements: SpatialElement[];
+    culledElements: SpatialElement[];
+    occlusionInfo: OcclusionInfo[];
+    statistics: {
+      totalElements: number;
+      frustumCulled: number;
+      occlusionCulled: number;
+      visibleElements: number;
+    };
+  } {
+    const worldWidth = viewport.width / viewport.zoom;
+    const worldHeight = viewport.height / viewport.zoom;
+    const viewportBounds = {
+      x: viewport.x - worldWidth / 2,
+      y: viewport.y - worldHeight / 2,
+      width: worldWidth,
+      height: worldHeight,
+    };
+    
+    const visibleElements: SpatialElement[] = [];
+    const culledElements: SpatialElement[] = [];
+    
+    for (const element of elements) {
+      if (this.boundsIntersect(element.bounds, viewportBounds)) {
+        visibleElements.push(element);
+      } else {
+        culledElements.push(element);
+      }
+    }
+    
+    return {
+      visibleElements,
+      culledElements,
+      occlusionInfo: [],
+      statistics: {
+        totalElements: elements.length,
+        frustumCulled: culledElements.length,
+        occlusionCulled: 0,
+        visibleElements: visibleElements.length,
+      },
+    };
+  }
+  
+  private boundsIntersect(bounds1: BoundingBox, bounds2: BoundingBox): boolean {
+    return !(
+      bounds1.x + bounds1.width < bounds2.x ||
+      bounds1.x > bounds2.x + bounds2.width ||
+      bounds1.y + bounds1.height < bounds2.y ||
+      bounds1.y > bounds2.y + bounds2.height
+    );
+  }
+  
+  /**
+   * Configuration methods
+   */
+  setFrustumCullDistance(distance: number): void {
+    this.frustumCullDistance = distance;
+  }
+  
+  setOcclusionTestDistance(distance: number): void {
+    this.occlusionTestDistance = distance;
+  }
+  
+  setLODDistanceThresholds(thresholds: number[]): void {
+    this.lodDistanceThresholds = [...thresholds].sort((a, b) => a - b);
+  }
+  
+  setGridSize(size: number): void {
+    this.gridSize = size;
+  }
+}
