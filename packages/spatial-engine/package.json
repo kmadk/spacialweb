@@ -1,0 +1,108 @@
+{
+  "name": "@fir/spatial-engine",
+  "version": "1.0.0",
+  "description": "High-performance spatial navigation engine with infinite zoom capabilities",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./cinematics": {
+      "types": "./dist/cinematics/index.d.ts",
+      "import": "./dist/cinematics/index.js",
+      "require": "./dist/cinematics/index.cjs"
+    },
+    "./performance": {
+      "types": "./dist/performance/index.d.ts",
+      "import": "./dist/performance/index.js",
+      "require": "./dist/performance/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:server": "node tests/test-server/server.js",
+    "test:visual": "playwright test --grep 'Visual Regression'",
+    "test:memory": "playwright test --grep 'Memory'",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist test-results"
+  },
+  "keywords": [
+    "spatial-navigation",
+    "infinite-zoom",
+    "penpot",
+    "penpot-flows",
+    "spatial-web",
+    "webgl",
+    "deck.gl",
+    "performance",
+    "visualization",
+    "infinite-canvas",
+    "design-to-code",
+    "cinematic",
+    "transitions",
+    "choreography",
+    "spatial-audio",
+    "narrative"
+  ],
+  "author": "FIR Spatial Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fir-spatial/spatial-web.git",
+    "directory": "packages/spatial-engine"
+  },
+  "dependencies": {
+    "@deck.gl/core": "^8.9.0",
+    "@deck.gl/layers": "^8.9.0",
+    "@deck.gl/react": "^8.9.0",
+    "@fir/penpot-parser": "workspace:^",
+    "rbush": "^3.0.1",
+    "d3-interpolate": "^3.0.1",
+    "d3-ease": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@playwright/test": "^1.40.0",
+    "jest": "^29.5.0",
+    "jest-canvas-mock": "^2.5.0",
+    "ts-jest": "^29.1.0",
+    "tsup": "^7.2.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.5.0"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/fir-spatial"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "sideEffects": false,
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}

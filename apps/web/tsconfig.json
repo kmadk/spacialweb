@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@fir/penpot-parser": ["../../packages/penpot-parser/src"],
+      "@fir/react-generator": ["../../packages/react-generator/src"],
+      "@fir/spatial-runtime": ["../../packages/spatial-runtime/src"]
+    }
+  },
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["dist", "node_modules"]
+}

@@ -1,0 +1,66 @@
+{
+  "name": "@fir/spatial-web",
+  "version": "1.0.0",
+  "description": "Transform Penpot designs into spatial web applications with infinite zoom",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@8.0.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "type-check": "pnpm -r type-check",
+    "clean": "pnpm -r clean && rimraf node_modules",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.2",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "prettier": "^3.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.2",
+    "vitest": "^0.34.0"
+  },
+  "keywords": [
+    "penpot",
+    "spatial-navigation",
+    "infinite-zoom",
+    "spatial-web",
+    "penpot-flows",
+    "design-to-code",
+    "react",
+    "deck.gl",
+    "webgl",
+    "code-generation",
+    "cinematic",
+    "spatial-audio",
+    "choreography",
+    "narrative",
+    "storytelling",
+    "design-system",
+    "animation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fir-spatial/spatial-web.git"
+  },
+  "author": "FIR Spatial Team",
+  "homepage": "https://github.com/fir-spatial/spatial-web",
+  "bugs": {
+    "url": "https://github.com/fir-spatial/spatial-web/issues"
+  },
+  "license": "MIT"
+}

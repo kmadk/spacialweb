@@ -1,0 +1,546 @@
+{
+  "version": "1.0.0",
+  "pages": [
+    {
+      "id": "home-page",
+      "name": "Home",
+      "objects": [
+        {
+          "id": "hero-section",
+          "name": "Hero Section",
+          "type": "group",
+          "selrect": [0, 0, 1200, 600],
+          "shapes": [
+            {
+              "id": "hero-bg",
+              "name": "Hero Background",
+              "type": "rect",
+              "selrect": [0, 0, 1200, 600],
+              "fill": {
+                "type": "gradient",
+                "gradient": {
+                  "type": "linear",
+                  "angle": 135,
+                  "stops": [
+                    { "offset": 0, "color": "#667eea" },
+                    { "offset": 1, "color": "#764ba2" }
+                  ]
+                }
+              }
+            },
+            {
+              "id": "hero-title",
+              "name": "Hero Title",
+              "type": "text",
+              "selrect": [100, 200, 600, 80],
+              "content": {
+                "fontFamily": "Inter, sans-serif",
+                "fontSize": 48,
+                "fontWeight": 700,
+                "color": "#ffffff",
+                "textAlign": "left",
+                "lineHeight": 1.2
+              },
+              "text": "Creative Developer & Designer"
+            },
+            {
+              "id": "hero-subtitle",
+              "name": "Hero Subtitle",
+              "type": "text",
+              "selrect": [100, 300, 500, 40],
+              "content": {
+                "fontFamily": "Inter, sans-serif",
+                "fontSize": 18,
+                "fontWeight": 400,
+                "color": "#ffffff",
+                "textAlign": "left",
+                "opacity": 0.9
+              },
+              "text": "Building beautiful, functional experiences with modern web technologies"
+            },
+            {
+              "id": "cta-button",
+              "name": "Call to Action",
+              "type": "rect",
+              "selrect": [100, 380, 160, 50],
+              "fill": {
+                "type": "solid",
+                "color": "#ffffff",
+                "opacity": 1
+              },
+              "interactions": [
+                {
+                  "trigger": "click",
+                  "action": {
+                    "type": "navigate",
+                    "target": "portfolio-page"
+                  }
+                }
+              ],
+              "layout": {
+                "display": "flex",
+                "justifyContent": "center",
+                "alignItems": "center"
+              }
+            },
+            {
+              "id": "cta-text",
+              "name": "CTA Text",
+              "type": "text",
+              "selrect": [100, 380, 160, 50],
+              "content": {
+                "fontFamily": "Inter, sans-serif",
+                "fontSize": 16,
+                "fontWeight": 600,
+                "color": "#667eea",
+                "textAlign": "center"
+              },
+              "text": "View Portfolio"
+            }
+          ]
+        },
+        {
+          "id": "navigation",
+          "name": "Navigation",
+          "type": "group",
+          "selrect": [0, 0, 1200, 80],
+          "shapes": [
+            {
+              "id": "nav-bg",
+              "name": "Nav Background",
+              "type": "rect",
+              "selrect": [0, 0, 1200, 80],
+              "fill": {
+                "type": "solid",
+                "color": "#ffffff",
+                "opacity": 0.95
+              },
+              "effects": [
+                {
+                  "type": "shadow",
+                  "blur": 10,
+                  "color": "#00000010",
+                  "offset": { "x": 0, "y": 2 }
+                }
+              ]
+            },
+            {
+              "id": "logo-text",
+              "name": "Logo",
+              "type": "text",
+              "selrect": [50, 25, 120, 30],
+              "content": {
+                "fontFamily": "Inter, sans-serif",
+                "fontSize": 20,
+                "fontWeight": 700,
+                "color": "#333333",
+                "textAlign": "left"
+              },
+              "text": "Portfolio"
+            },
+            {
+              "id": "nav-home",
+              "name": "Home Link",
+              "type": "text",
+              "selrect": [900, 30, 50, 20],
+              "content": {
+                "fontFamily": "Inter, sans-serif",
+                "fontSize": 14,
+                "fontWeight": 500,
+                "color": "#667eea",
+                "textAlign": "center"
+              },
+              "text": "Home",
+              "interactions": [
+                {
+                  "trigger": "click",
+                  "action": {
+                    "type": "navigate",
+                    "target": "home-page"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "nav-about",
+              "name": "About Link",
+              "type": "text",
+              "selrect": [970, 30, 50, 20],
+              "content": {
+                "fontFamily": "Inter, sans-serif",
+                "fontSize": 14,
+                "fontWeight": 500,
+                "color": "#666666",
+                "textAlign": "center"
+              },
+              "text": "About",
+              "interactions": [
+                {
+                  "trigger": "click",
+                  "action": {
+                    "type": "navigate",
+                    "target": "about-page"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "nav-contact",
+              "name": "Contact Link",
+              "type": "text",
+              "selrect": [1040, 30, 60, 20],
+              "content": {
+                "fontFamily": "Inter, sans-serif",
+                "fontSize": 14,
+                "fontWeight": 500,
+                "color": "#666666",
+                "textAlign": "center"
+              },
+              "text": "Contact",
+              "interactions": [
+                {
+                  "trigger": "click",
+                  "action": {
+                    "type": "navigate",
+                    "target": "contact-page"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "portfolio-page",
+      "name": "Portfolio",
+      "objects": [
+        {
+          "id": "portfolio-header",
+          "name": "Portfolio Header",
+          "type": "text",
+          "selrect": [100, 150, 400, 60],
+          "content": {
+            "fontFamily": "Inter, sans-serif",
+            "fontSize": 36,
+            "fontWeight": 700,
+            "color": "#333333",
+            "textAlign": "left"
+          },
+          "text": "My Work"
+        },
+        {
+          "id": "project-grid",
+          "name": "Project Grid",
+          "type": "group",
+          "selrect": [100, 250, 1000, 800],
+          "layout": {
+            "display": "grid",
+            "gridTemplateColumns": "repeat(2, 1fr)",
+            "gap": 40
+          },
+          "shapes": [
+            {
+              "id": "project-1",
+              "name": "Project 1",
+              "type": "group",
+              "selrect": [0, 0, 480, 360],
+              "shapes": [
+                {
+                  "id": "project-1-image",
+                  "name": "Project 1 Image",
+                  "type": "rect",
+                  "selrect": [0, 0, 480, 280],
+                  "fill": {
+                    "type": "solid",
+                    "color": "#f8f9fa"
+                  },
+                  "effects": [
+                    {
+                      "type": "shadow",
+                      "blur": 20,
+                      "color": "#00000015",
+                      "offset": { "x": 0, "y": 10 }
+                    }
+                  ]
+                },
+                {
+                  "id": "project-1-title",
+                  "name": "Project 1 Title",
+                  "type": "text",
+                  "selrect": [0, 300, 300, 30],
+                  "content": {
+                    "fontFamily": "Inter, sans-serif",
+                    "fontSize": 20,
+                    "fontWeight": 600,
+                    "color": "#333333",
+                    "textAlign": "left"
+                  },
+                  "text": "E-commerce Platform"
+                },
+                {
+                  "id": "project-1-desc",
+                  "name": "Project 1 Description",
+                  "type": "text",
+                  "selrect": [0, 330, 400, 30],
+                  "content": {
+                    "fontFamily": "Inter, sans-serif",
+                    "fontSize": 14,
+                    "fontWeight": 400,
+                    "color": "#666666",
+                    "textAlign": "left"
+                  },
+                  "text": "Modern React-based shopping experience"
+                }
+              ],
+              "interactions": [
+                {
+                  "trigger": "click",
+                  "action": {
+                    "type": "navigate",
+                    "target": "project-detail-1"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "project-2",
+              "name": "Project 2",
+              "type": "group",
+              "selrect": [520, 0, 480, 360],
+              "shapes": [
+                {
+                  "id": "project-2-image",
+                  "name": "Project 2 Image",
+                  "type": "rect",
+                  "selrect": [0, 0, 480, 280],
+                  "fill": {
+                    "type": "solid",
+                    "color": "#f8f9fa"
+                  },
+                  "effects": [
+                    {
+                      "type": "shadow",
+                      "blur": 20,
+                      "color": "#00000015",
+                      "offset": { "x": 0, "y": 10 }
+                    }
+                  ]
+                },
+                {
+                  "id": "project-2-title",
+                  "name": "Project 2 Title",
+                  "type": "text",
+                  "selrect": [0, 300, 300, 30],
+                  "content": {
+                    "fontFamily": "Inter, sans-serif",
+                    "fontSize": 20,
+                    "fontWeight": 600,
+                    "color": "#333333",
+                    "textAlign": "left"
+                  },
+                  "text": "Task Management App"
+                },
+                {
+                  "id": "project-2-desc",
+                  "name": "Project 2 Description",
+                  "type": "text",
+                  "selrect": [0, 330, 400, 30],
+                  "content": {
+                    "fontFamily": "Inter, sans-serif",
+                    "fontSize": 14,
+                    "fontWeight": 400,
+                    "color": "#666666",
+                    "textAlign": "left"
+                  },
+                  "text": "Collaborative productivity tool with real-time sync"
+                }
+              ],
+              "interactions": [
+                {
+                  "trigger": "click",
+                  "action": {
+                    "type": "navigate",
+                    "target": "project-detail-2"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "button-primary",
+      "name": "Primary Button",
+      "objects": [
+        {
+          "id": "button-bg",
+          "name": "Button Background",
+          "type": "rect",
+          "selrect": [0, 0, 160, 50],
+          "fill": {
+            "type": "solid",
+            "color": "#667eea",
+            "opacity": 1
+          },
+          "layout": {
+            "display": "flex",
+            "justifyContent": "center",
+            "alignItems": "center"
+          },
+          "effects": [
+            {
+              "type": "shadow",
+              "blur": 6,
+              "color": "#667eea30",
+              "offset": { "x": 0, "y": 3 }
+            }
+          ]
+        },
+        {
+          "id": "button-text",
+          "name": "Button Text",
+          "type": "text",
+          "selrect": [20, 15, 120, 20],
+          "content": {
+            "fontFamily": "Inter, sans-serif",
+            "fontSize": 14,
+            "fontWeight": 600,
+            "color": "#ffffff",
+            "textAlign": "center"
+          },
+          "text": "Get Started"
+        }
+      ]
+    },
+    {
+      "id": "card-project",
+      "name": "Project Card",
+      "objects": [
+        {
+          "id": "card-container",
+          "name": "Card Container",
+          "type": "rect",
+          "selrect": [0, 0, 480, 360],
+          "fill": {
+            "type": "solid",
+            "color": "#ffffff",
+            "opacity": 1
+          },
+          "effects": [
+            {
+              "type": "shadow",
+              "blur": 24,
+              "color": "#00000012",
+              "offset": { "x": 0, "y": 12 }
+            }
+          ],
+          "layout": {
+            "display": "flex",
+            "flexDirection": "column",
+            "padding": { "top": 24, "right": 24, "bottom": 24, "left": 24 }
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "hero-bg-image",
+      "name": "hero-background.jpg",
+      "type": "image",
+      "path": "assets/hero-background.jpg"
+    },
+    {
+      "id": "project-1-image",
+      "name": "ecommerce-preview.png",
+      "type": "image", 
+      "path": "assets/ecommerce-preview.png"
+    },
+    {
+      "id": "project-2-image",
+      "name": "taskapp-preview.png",
+      "type": "image",
+      "path": "assets/taskapp-preview.png"
+    }
+  ],
+  "tokens": {
+    "colors": {
+      "primary": "#667eea",
+      "primaryDark": "#5a67d8",
+      "secondary": "#764ba2",
+      "accent": "#ed64a6",
+      "neutral": {
+        "50": "#f8f9fa",
+        "100": "#f1f3f4",
+        "200": "#e8eaed",
+        "300": "#dadce0",
+        "400": "#bdc1c6",
+        "500": "#9aa0a6",
+        "600": "#80868b",
+        "700": "#5f6368",
+        "800": "#3c4043",
+        "900": "#202124"
+      },
+      "success": "#10b981",
+      "warning": "#f59e0b", 
+      "error": "#ef4444"
+    },
+    "typography": {
+      "fontFamily": {
+        "sans": "Inter, system-ui, -apple-system, sans-serif",
+        "mono": "Fira Code, Consolas, monospace"
+      },
+      "fontSize": {
+        "xs": 12,
+        "sm": 14,
+        "base": 16,
+        "lg": 18,
+        "xl": 20,
+        "2xl": 24,
+        "3xl": 30,
+        "4xl": 36,
+        "5xl": 48,
+        "6xl": 60
+      },
+      "fontWeight": {
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      }
+    },
+    "spacing": {
+      "xs": 4,
+      "sm": 8,
+      "md": 16,
+      "lg": 24,
+      "xl": 32,
+      "2xl": 48,
+      "3xl": 64
+    },
+    "shadows": {
+      "sm": {
+        "type": "shadow",
+        "blur": 6,
+        "color": "#00000010",
+        "offset": { "x": 0, "y": 1 }
+      },
+      "md": {
+        "type": "shadow", 
+        "blur": 15,
+        "color": "#00000015",
+        "offset": { "x": 0, "y": 4 }
+      },
+      "lg": {
+        "type": "shadow",
+        "blur": 25,
+        "color": "#00000015", 
+        "offset": { "x": 0, "y": 10 }
+      }
+    }
+  }
+}

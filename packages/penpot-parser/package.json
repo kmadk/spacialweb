@@ -1,0 +1,38 @@
+{
+  "name": "@fir/penpot-parser",
+  "version": "1.0.0",
+  "description": "Parser for Penpot design files",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "fast-xml-parser": "^4.2.7",
+    "image-size": "^1.0.2"
+  },
+  "devDependencies": {
+    "tsup": "^7.2.0",
+    "rimraf": "^5.0.0"
+  },
+  "keywords": [
+    "penpot",
+    "parser",
+    "design-files"
+  ]
+}

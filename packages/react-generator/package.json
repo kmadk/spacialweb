@@ -1,0 +1,40 @@
+{
+  "name": "@fir/react-generator",
+  "version": "1.0.0",
+  "description": "Generate React components from Penpot designs",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@fir/penpot-parser": "workspace:*",
+    "@babel/generator": "^7.22.0",
+    "@babel/types": "^7.22.0",
+    "prettier": "^3.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^7.2.0",
+    "rimraf": "^5.0.0"
+  },
+  "keywords": [
+    "react",
+    "code-generation",
+    "penpot",
+    "components"
+  ]
+}

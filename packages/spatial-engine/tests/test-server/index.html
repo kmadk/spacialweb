@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spatial Engine Test Server</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
+    
+    .test-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    .spatial-canvas {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    .controls button {
+      margin: 2px;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+    }
+    
+    .controls button:hover {
+      background: #f0f0f0;
+    }
+    
+    .status {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <div class="controls">
+      <button onclick="testZoomIn()">Zoom In</button>
+      <button onclick="testZoomOut()">Zoom Out</button>
+      <button onclick="testPan()">Pan</button>
+      <button onclick="testReset()">Reset</button>
+      <button onclick="loadTestElements()">Load Elements</button>
+      <button onclick="clearElements()">Clear</button>
+    </div>
+    
+    <canvas 
+      id="spatial-canvas" 
+      class="spatial-canvas"
+      data-testid="spatial-canvas"
+    ></canvas>
+    
+    <div id="status" class="status">
+      Initializing...
+    </div>
+  </div>
+
+  <div data-testid="spatial-engine-loaded" style="display: none;"></div>
+
+  <script type="module">
+    import { OptimizedSpatialEngine } from '../src/optimized-spatial-engine.js';
+    
+    // Global engine instance for testing
+    window.spatialEngine = null;
+    window.testElements = [];
+    
+    // Status updates
+    function updateStatus(message) {
+      document.getElementById('status').innerHTML = message;
+    }
+    
+    // Initialize spatial engine
+    async function init() {
+      try {
+        const canvas = document.getElementById('spatial-canvas');
+        const container = canvas.parentElement;
+        
+        window.spatialEngine = new OptimizedSpatialEngine({
+          container,
+          width: container.clientWidth,
+          height: container.clientHeight,
+        });
+        
+        // Set up event listeners for testing
+        window.spatialEngine.on('viewportChange', (viewport) => {
+          updateStatus(`
+            Viewport: x=${viewport.x.toFixed(1)}, y=${viewport.y.toFixed(1)}, zoom=${viewport.zoom.toFixed(2)}
+            <br>Elements: ${window.spatialEngine.getElements().length}
+          `);
+        });
+        
+        window.spatialEngine.on('elementClick', (element, event) => {
+          console.log('Element clicked:', element.id, event);
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+          const newWidth = container.clientWidth;
+          const newHeight = container.clientHeight;
+          // Update engine size if needed
+        });
+        
+        // Show loaded indicator for Playwright
+        document.querySelector('[data-testid="spatial-engine-loaded"]').style.display = 'block';
+        
+        updateStatus('Spatial Engine Ready');
+        
+        // Load initial test elements
+        loadTestElements();
+        
+      } catch (error) {
+        console.error('Failed to initialize spatial engine:', error);
+        updateStatus(`Error: ${error.message}`);
+      }
+    }
+    
+    // Test functions
+    window.testZoomIn = () => {
+      const viewport = window.spatialEngine.getViewport();
+      window.spatialEngine.setViewport({
+        ...viewport,
+        zoom: viewport.zoom * 2
+      });
+    };
+    
+    window.testZoomOut = () => {
+      const viewport = window.spatialEngine.getViewport();
+      window.spatialEngine.setViewport({
+        ...viewport,
+        zoom: viewport.zoom / 2
+      });
+    };
+    
+    window.testPan = () => {
+      const viewport = window.spatialEngine.getViewport();
+      window.spatialEngine.setViewport({
+        ...viewport,
+        x: viewport.x + 200,
+        y: viewport.y + 200
+      });
+    };
+    
+    window.testReset = () => {
+      window.spatialEngine.resetViewport();
+    };
+    
+    window.loadTestElements = () => {
+      const elements = [];
+      
+      // Create colorful grid of test elements
+      for (let i = 0; i < 100; i++) {
+        const row = Math.floor(i / 10);
+        const col = i % 10;
+        
+        elements.push({
+          id: `test-element-${i}`,
+          type: Math.random() > 0.5 ? 'rectangle' : 'circle',
+          bounds: {
+            x: col * 120 + 50,
+            y: row * 120 + 50,
+            width: 80 + Math.random() * 40,
+            height: 80 + Math.random() * 40,
+          },
+          styles: {
+            fill: `hsl(${(i * 36) % 360}, 70%, 50%)`,
+            stroke: '#000',
+            strokeWidth: 2,
+          },
+          children: [],
+        });
+      }
+      
+      window.testElements = elements;
+      window.spatialEngine.setElements(elements);
+    };
+    
+    window.clearElements = () => {
+      window.spatialEngine.setElements([]);
+      window.testElements = [];
+    };
+    
+    // Performance monitoring for tests
+    window.getPerformanceMetrics = () => {
+      return {
+        memory: performance.memory ? {
+          used: performance.memory.usedJSHeapSize,
+          total: performance.memory.totalJSHeapSize,
+          limit: performance.memory.jsHeapSizeLimit,
+        } : null,
+        timing: performance.getEntriesByType('navigation')[0],
+        spatialStats: window.spatialEngine ? window.spatialEngine.getPerformanceStats() : null,
+      };
+    };
+    
+    // Initialize when page loads
+    init();
+  </script>
+</body>
+</html>

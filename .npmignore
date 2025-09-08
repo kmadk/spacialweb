@@ -1,0 +1,43 @@
+# Development files
+*.test.ts
+*.test.js
+__tests__/
+coverage/
+.nyc_output/
+
+# Build artifacts
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Development tools
+.eslintrc*
+.prettierrc*
+jest.config.*
+vitest.config.*
+
+# Documentation sources
+docs/
+examples/
+SYSTEM_SUMMARY.md
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Source maps (optional - include if you want them in the package)
+# *.map

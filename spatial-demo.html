@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinematic Spatial Navigation Demo</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .demo-container {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #1a1a1a;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .scenario-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .scenario-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .scenario-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+
+        .controls {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            background: rgba(0, 200, 0, 0.2);
+            border: 1px solid rgba(0, 200, 0, 0.3);
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .control-button:hover {
+            background: rgba(0, 200, 0, 0.3);
+        }
+
+        .control-button.stop {
+            background: rgba(200, 0, 0, 0.2);
+            border-color: rgba(200, 0, 0, 0.3);
+        }
+
+        .control-button.stop:hover {
+            background: rgba(200, 0, 0, 0.3);
+        }
+
+        .spatial-canvas {
+            position: absolute;
+            left: 300px;
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-size: 18px;
+            opacity: 0.7;
+        }
+
+        .scenario-description {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .playing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">🎬 Cinematic Spatial Navigation</div>
+        <div class="subtitle">Experience narrative-driven spatial transitions with Penpot flows</div>
+    </div>
+
+    <div class="demo-container">
+        <div class="sidebar">
+            <h3 style="margin: 0 0 15px 0; font-size: 16px;">Demo Scenarios</h3>
+            
+            <button class="scenario-button" data-scenario="Hero Journey">
+                🏰 Hero Journey
+                <div class="scenario-description">Classic hero's journey with expanding spiral layout and dramatic transitions</div>
+            </button>
+            
+            <button class="scenario-button" data-scenario="Spiral Story">
+                🌀 Spiral Story
+                <div class="scenario-description">Golden ratio spiral layout with cinematic reveal transitions</div>
+            </button>
+            
+            <button class="scenario-button" data-scenario="Timeline">
+                📅 Timeline
+                <div class="scenario-description">Linear timeline with professional focus transitions</div>
+            </button>
+            
+            <button class="scenario-button" data-scenario="Hub and Spoke">
+                🎯 Hub and Spoke
+                <div class="scenario-description">Central hub with radial navigation to feature areas</div>
+            </button>
+            
+            <button class="scenario-button" data-scenario="Exploration Grid">
+                🔍 Exploration Grid
+                <div class="scenario-description">Grid-based exploration with playful bounce transitions</div>
+            </button>
+            
+            <button class="scenario-button" data-scenario="Presentation">
+                📊 Presentation
+                <div class="scenario-description">Linear presentation flow with professional transitions</div>
+            </button>
+            
+            <button class="scenario-button" data-scenario="User Journey">
+                👤 User Journey
+                <div class="scenario-description">User onboarding flow with calm documentary-style transitions</div>
+            </button>
+
+            <div class="controls">
+                <h4 style="margin: 0 0 10px 0; font-size: 14px;">Controls</h4>
+                <button class="control-button" id="play-all">▶ Play All Connections</button>
+                <button class="control-button" id="demo-movements">🎭 Demo Movement Types</button>
+                <button class="control-button" id="show-metrics">📊 Show Performance Metrics</button>
+                <button class="control-button" id="export-scenario">💾 Export Current Scenario</button>
+                <button class="control-button stop" id="stop-demo">⏹ Stop Demo</button>
+            </div>
+        </div>
+
+        <div class="spatial-canvas" id="spatial-canvas">
+            <div class="loading">
+                Select a demo scenario to begin...
+            </div>
+        </div>
+
+        <div class="info-panel" id="info-panel">
+            <div><strong>🎬 Cinematic Demo</strong></div>
+            <div style="margin-top: 8px; font-size: 11px;">
+                This demo showcases advanced spatial navigation with cinematic transitions based on Penpot flow connections. 
+                Each scenario demonstrates different narrative layouts and movement styles.
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // This is a demo HTML file - in a real implementation, you would import the actual modules
+        console.log('🎬 Cinematic Spatial Navigation Demo');
+        console.log('This demo showcases the cinematic movement system for Penpot connections.');
+        console.log('');
+        console.log('Features demonstrated:');
+        console.log('• Narrative layout patterns (hero journey, spiral, timeline, etc.)');
+        console.log('• Cinematic movement styles (documentary, dramatic, playful, etc.)');
+        console.log('• Connection-aware spatial algorithms');
+        console.log('• Performance optimization for smooth 60fps transitions');
+        console.log('• Accessibility features with spatial audio cues');
+        console.log('');
+        console.log('To run the actual demo:');
+        console.log('1. Import the CinematicDemo class from the spatial-engine package');
+        console.log('2. Create demo instance: new CinematicDemo({ container, showControls: true })');
+        console.log('3. Load scenarios: demo.runScenario("Hero Journey", { autoPlay: true })');
+        
+        // Mock demo functionality for HTML preview
+        let currentScenario = null;
+        let isPlaying = false;
+
+        // Add event listeners to buttons
+        document.querySelectorAll('.scenario-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.scenario-button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                
+                const scenario = button.dataset.scenario;
+                currentScenario = scenario;
+                
+                // Update canvas content
+                const canvas = document.getElementById('spatial-canvas');
+                canvas.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 18px;">
+                        🎬 ${scenario} scenario loaded<br>
+                        <small style="font-size: 12px; opacity: 0.7; margin-top: 10px;">
+                            In the real implementation, this would show the spatial engine with cinematic transitions
+                        </small>
+                    </div>
+                `;
+                
+                updateInfoPanel(scenario);
+                console.log(`📡 Loaded scenario: ${scenario}`);
+            });
+        });
+
+        document.getElementById('play-all').addEventListener('click', () => {
+            if (!currentScenario) {
+                alert('Please select a scenario first');
+                return;
+            }
+            
+            if (isPlaying) return;
+            
+            isPlaying = true;
+            document.body.classList.add('playing');
+            console.log(`🎬 Playing all connections for: ${currentScenario}`);
+            
+            // Simulate demo playback
+            setTimeout(() => {
+                isPlaying = false;
+                document.body.classList.remove('playing');
+                console.log('🎬 Demo sequence completed');
+            }, 5000);
+        });
+
+        document.getElementById('demo-movements').addEventListener('click', () => {
+            console.log('🎭 Demonstrating movement types: documentary-pan, cinematic-reveal, playful-bounce, professional-focus, dramatic-zoom');
+        });
+
+        document.getElementById('show-metrics').addEventListener('click', () => {
+            console.log('📊 Performance Metrics:');
+            console.log('   Frame Rate: 60.0 fps');
+            console.log('   Memory Usage: 42.5 MB');
+            console.log('   Transition Time: 847 ms');
+        });
+
+        document.getElementById('export-scenario').addEventListener('click', () => {
+            if (!currentScenario) {
+                alert('Please select a scenario first');
+                return;
+            }
+            console.log(`💾 Exporting scenario: ${currentScenario}`);
+            console.log('Scenario data would be exported as JSON for debugging');
+        });
+
+        document.getElementById('stop-demo').addEventListener('click', () => {
+            isPlaying = false;
+            document.body.classList.remove('playing');
+            console.log('⏹ Demo stopped');
+        });
+
+        function updateInfoPanel(scenario) {
+            const panel = document.getElementById('info-panel');
+            const descriptions = {
+                'Hero Journey': 'Classic narrative structure with expanding spiral layout and dramatic zoom transitions',
+                'Spiral Story': 'Golden ratio spiral with cinematic reveal effects and depth parallax',
+                'Timeline': 'Linear progression with professional focus and smooth panning',
+                'Hub and Spoke': 'Central hub navigation with radial zoom and highlight effects',
+                'Exploration Grid': 'Free-form exploration with playful bounce and elastic easing',
+                'Presentation': 'Slide-based progression with clean professional transitions',
+                'User Journey': 'Onboarding flow with calm documentary-style movements'
+            };
+            
+            panel.innerHTML = `
+                <div><strong>🎬 ${scenario}</strong></div>
+                <div style="margin-top: 8px; font-size: 11px; line-height: 1.4;">
+                    ${descriptions[scenario] || 'Loading scenario...'}
+                </div>
+                <div style="margin-top: 8px; font-size: 10px; opacity: 0.6;">
+                    Click "Play All Connections" to see the cinematic transitions
+                </div>
+            `;
+        }
+
+        // Show initial info
+        updateInfoPanel('Demo');
+    </script>
+</body>
+</html>
