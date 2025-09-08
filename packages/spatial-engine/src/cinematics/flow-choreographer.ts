@@ -4,7 +4,7 @@
  */
 
 import type { SpatialElement, Viewport, TransitionOptions } from '../types.js';
-import { easeInOutCubic, easeInOutQuart, easeOutBack, easeInBack } from 'd3-ease';
+// Using our own easing functions instead of d3-ease to avoid conflicts
 import { CinematicEasingLibrary, type EasingFunction } from './cinematic-easing.js';
 import { SpatialAudioEngine, type SpatialAudioOptions } from './spatial-audio.js';
 

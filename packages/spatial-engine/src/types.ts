@@ -4,6 +4,7 @@ import type { BoundingBox } from '@fir/penpot-parser';
 export interface Viewport {
   x: number;
   y: number;
+  z?: number; // Optional z-coordinate for 3D navigation
   zoom: number;
   width: number;
   height: number;
@@ -14,11 +15,19 @@ export interface Point {
   y: number;
 }
 
+export interface Point3D {
+  x: number;
+  y: number;
+  z: number;
+}
+
 export interface SpatialElement {
   id: string;
   type: string;
   position: Point;
   bounds: BoundingBox;
+  zPosition?: number; // Z-coordinate for 3D layering
+  zBounds?: { near: number; far: number }; // 3D depth bounds
   data?: any;
   children?: SpatialElement[];
   lodLevel?: number;
@@ -50,7 +59,7 @@ export interface SpatialConnection {
 export interface TransitionOptions {
   duration?: number;
   easing?: EasingFunction;
-  type?: 'fly' | 'zoom' | 'pan';
+  type?: 'fly' | 'zoom' | 'pan' | 'dive' | 'emerge';
   onProgress?: (progress: number) => void;
   onComplete?: () => void;
 }
@@ -88,6 +97,9 @@ export interface SpatialEngineOptions {
   initialViewport?: Partial<Viewport>;
   maxZoom?: number;
   minZoom?: number;
+  maxDepth?: number;
+  minDepth?: number;
+  enable3D?: boolean;
   enableLOD?: boolean;
   enableCulling?: boolean;
   performanceMode?: 'high-quality' | 'balanced' | 'performance';
@@ -99,7 +111,9 @@ export type EasingFunction =
   | 'easeInOutCubic'
   | 'easeOutQuart'
   | 'easeOutExpo'
-  | 'easeInOutBack';
+  | 'easeInOutBack'
+  | 'easeInOutElastic'  // Good for z-axis depth transitions
+  | 'easeOutBounce';    // Engaging for layer emergence
 
 export interface EventMap {
   viewportChange: Viewport;
@@ -107,4 +121,44 @@ export interface EventMap {
   elementHover: SpatialElement;
   customAction: { action: any; element: SpatialElement };
   performanceUpdate: PerformanceMetrics;
+  zNavigationStart: { fromZ: number; toZ: number };
+  zNavigationEnd: { z: number };
+}
+
+// Z-axis navigation specific interfaces
+export interface ZNavigationOptions {
+  targetZ?: number;
+  relativeDelta?: number;
+  transitionDuration?: number;
+  easing?: EasingFunction;
+  onProgress?: (progress: number, currentZ: number) => void;
+  onComplete?: (finalZ: number) => void;
+}
+
+export interface SpatialLayer {
+  id: string;
+  name?: string;
+  zIndex: number;
+  elements: SpatialElement[];
+  visible: boolean;
+  opacity?: number;
+  cullDistance?: number; // Distance at which layer becomes invisible
+}
+
+// Plugin system interfaces
+export interface SpatialPlugin {
+  id: string;
+  name: string;
+  version: string;
+  initialize(engine: any): void;
+  destroy(): void;
+  onViewportChange?(viewport: Viewport): void;
+  onElementInteraction?(element: SpatialElement, type: string): void;
+}
+
+export interface SpatialBehavior {
+  id: string;
+  name: string;
+  apply(elements: SpatialElement[], context: any): SpatialElement[];
+  shouldApply(context: any): boolean;
 }
