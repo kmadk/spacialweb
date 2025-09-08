@@ -241,7 +241,7 @@ export class CinematicEasingLibrary {
     'depth-parallax': {
       name: 'Depth Parallax',
       description: 'Creates sense of depth with layered movement',
-      emotionalTone: 'cinematic',
+      emotionalTone: 'dramatic',
       function: (t: number) => {
         // Non-linear progression for parallax effect
         const base = easeInOutQuart(t);

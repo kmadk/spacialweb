@@ -26,8 +26,8 @@ export interface DemoScenario {
 
 export class CinematicDemo {
   private engine: OptimizedSpatialEngine;
-  private choreographer: FlowChoreographer;
-  private parser: PenpotFlowParser;
+  // private choreographer: FlowChoreographer;
+  // private parser: PenpotFlowParser;
   private currentScenario: DemoScenario | null = null;
   private isPlaying = false;
 
@@ -80,6 +80,8 @@ export class CinematicDemo {
     const world: SpatialWorld = {
       bounds: this.calculateWorldBounds(scenario.elements),
       elements: scenario.elements,
+      regions: [],
+      connections: [],
     };
 
     // Load world into engine
@@ -314,7 +316,7 @@ export class CinematicDemo {
     const elements = [hubElement, ...spokeElements];
 
     // Create connections from hub to all spokes
-    const connections: PenpotConnection[] = spokeElements.map((spoke, index) => ({
+    const connections: PenpotConnection[] = spokeElements.map((spoke) => ({
       id: `hub-to-${spoke.id}`,
       fromElement: hubElement.id,
       toElement: spoke.id,
@@ -522,6 +524,8 @@ export class CinematicDemo {
     return {
       bounds: this.calculateWorldBounds(elements),
       elements,
+      regions: [],
+      connections: [],
     };
   }
 

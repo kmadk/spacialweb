@@ -413,7 +413,7 @@ export class SpatialAudioEngine {
 
   private updateSpatialSources(): void {
     // Update positions of all active spatial sources based on listener movement
-    for (const [cueId, pannerNode] of this.state.spatialNodes) {
+    for (const [, pannerNode] of this.state.spatialNodes) {
       // In a more advanced implementation, you could adjust spatial parameters
       // based on listener movement, zoom level, etc.
     }

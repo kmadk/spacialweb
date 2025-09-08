@@ -198,7 +198,7 @@ export class WebGLRenderer {
     `;
 
     // GPU culling compute shader (if available)
-    const cullingComputeShader = `#version 310 es // Unused compute shader
+    // const cullingComputeShader = `#version 310 es // Unused compute shader
       layout(local_size_x = 64) in;
       
       layout(std430, binding = 0) readonly buffer InputElements {

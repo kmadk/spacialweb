@@ -5,7 +5,7 @@
 
 import type { SpatialElement, Viewport, TransitionOptions } from '../types.js';
 // Using our own easing functions instead of d3-ease to avoid conflicts
-import { CinematicEasingLibrary, type EasingFunction } from './cinematic-easing.js';
+import { CinematicEasingLibrary } from './cinematic-easing.js';
 import { SpatialAudioEngine, type SpatialAudioOptions } from './spatial-audio.js';
 
 export interface PenpotFlow {
@@ -177,7 +177,6 @@ export class FlowChoreographer {
    * Generate automatic spatial layout based on narrative flow
    */
   private generateNarrativeLayout(flow: PenpotFlow, elements: SpatialElement[]): Map<string, any> {
-    const layout = new Map();
     const flowElements = elements.filter(el => 
       flow.connections.some(conn => conn.fromElement === el.id || conn.toElement === el.id)
     );
@@ -618,7 +617,7 @@ export class FlowChoreographer {
     };
   }
 
-  private interpolateEffects(from?: any, to?: any, progress?: number): any {
+  private interpolateEffects(from?: any, to?: any, progress: number = 0): any {
     if (!from && !to) return undefined;
     if (!from) return to;
     if (!to) return from;
