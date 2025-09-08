@@ -3,7 +3,13 @@
  * Features instanced rendering, texture atlasing, and GPU-accelerated culling
  */
 
-import type { SpatialElement, Viewport, BoundingBox } from '../types.js';
+import type { SpatialElement, Viewport } from '../types.js';
+
+interface WebGLProgramWithMeta {
+  program: WebGLProgram;
+  uniforms: Record<string, WebGLUniformLocation>;
+  attributes: Record<string, number>;
+}
 
 interface WebGLProgram {
   program: WebGLProgram;
@@ -29,14 +35,14 @@ interface TextureAtlas {
 
 export class WebGLRenderer {
   private gl: WebGL2RenderingContext;
-  private programs: Map<string, WebGLProgram> = new Map();
+  private programs: Map<string, WebGLProgramWithMeta> = new Map();
   private buffers: Map<string, WebGLBuffer> = new Map();
   private textures: Map<string, WebGLTexture> = new Map();
-  private textureAtlas: TextureAtlas;
-  private instancedVBO: WebGLBuffer;
-  private quadVBO: WebGLBuffer;
-  private quadIBO: WebGLBuffer;
-  private transformFeedback: WebGLTransformFeedback;
+  private textureAtlas!: TextureAtlas;
+  private instancedVBO!: WebGLBuffer;
+  private quadVBO!: WebGLBuffer;
+  private quadIBO!: WebGLBuffer;
+  // private transformFeedback!: WebGLTransformFeedback; // Unused
   
   // Performance tracking
   private frameStats = {
@@ -197,7 +203,7 @@ export class WebGLRenderer {
     `;
 
     // GPU culling compute shader (if available)
-    const cullingComputeShader = `#version 310 es
+    // const cullingComputeShader = `#version 310 es // Unused compute shader
       layout(local_size_x = 64) in;
       
       layout(std430, binding = 0) readonly buffer InputElements {
@@ -243,13 +249,12 @@ export class WebGLRenderer {
     this.programs.set('instanced', this.createProgram(instancedVertexShader, instancedFragmentShader));
     
     // Create compute shader if supported
-    if (this.gl.getParameter(this.gl.MAX_COMPUTE_WORK_GROUP_SIZE)) {
-      // WebGL2 compute shaders aren't widely supported yet
-      // This is future-proofing for when they are
-    }
+    // WebGL2 doesn't have MAX_COMPUTE_WORK_GROUP_SIZE - this is WebGPU
+    // WebGL2 compute shaders aren't widely supported yet
+    // This is future-proofing for when they are
   }
 
-  private createProgram(vertexSource: string, fragmentSource: string): WebGLProgram {
+  private createProgram(vertexSource: string, fragmentSource: string): WebGLProgramWithMeta {
     const gl = this.gl;
     
     const vertexShader = this.createShader(gl.VERTEX_SHADER, vertexSource);
@@ -477,14 +482,14 @@ export class WebGLRenderer {
     }
     
     // Prepare instance data
-    const instanceData = this.prepareInstanceData(batch.elements, is3D);
+    const instanceData = this.prepareInstanceData(batch.elements);
     
     // Update instanced buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, this.instancedVBO);
     gl.bufferData(gl.ARRAY_BUFFER, instanceData, gl.DYNAMIC_DRAW);
     
     // Set up vertex attributes
-    this.setupVertexAttributes(program, is3D);
+    this.setupVertexAttributes(program);
     
     // Bind texture if needed
     if (batch.texture) {
@@ -506,7 +511,7 @@ export class WebGLRenderer {
     this.frameStats.instancesRendered += batch.instanceCount;
   }
 
-  private prepareInstanceData(elements: SpatialElement[], is3D: boolean = false): Float32Array {
+  private prepareInstanceData(elements: SpatialElement[]): Float32Array {
     // Each instance needs: transform(4) + color(4) + texCoords(4) + depth(1) + z(1) = 14 floats
     const floatsPerInstance = 14;
     const data = new Float32Array(elements.length * floatsPerInstance);
@@ -577,7 +582,7 @@ export class WebGLRenderer {
     return [0, 0, 1, 1];
   }
 
-  private setupVertexAttributes(program: WebGLProgram, is3D: boolean = false): void {
+  private setupVertexAttributes(program: WebGLProgramWithMeta): void {
     const gl = this.gl;
     const strideBytes = 14 * 4; // 14 floats * 4 bytes per float
     

@@ -27,7 +27,6 @@ export type {
   LODLevel,
   PerformanceMetrics,
   SpatialEngineOptions,
-  EasingFunction,
   EventMap,
   BoundingBox,
   // 3D Navigation types (NEW)

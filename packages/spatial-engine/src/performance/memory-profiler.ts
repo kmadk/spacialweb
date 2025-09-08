@@ -237,7 +237,7 @@ export class MemoryProfiler {
   public forceGC(): void {
     if ((window as any).gc) {
       (window as any).gc();
-    } else if ((global as any).gc) {
+    } else if (typeof global !== 'undefined' && (global as any).gc) {
       (global as any).gc();
     }
   }

@@ -1,5 +1,7 @@
 import type { Layer } from '@deck.gl/core';
-import type { BoundingBox } from '@fir/penpot-parser';
+import type { BoundingBox as PenpotBoundingBox } from '@fir/penpot-parser';
+
+export type BoundingBox = PenpotBoundingBox;
 
 export interface Viewport {
   x: number;
@@ -32,6 +34,8 @@ export interface SpatialElement {
   children?: SpatialElement[];
   lodLevel?: number;
   renderPriority?: number;
+  styles?: any; // Element styles
+  layer?: number; // Layer index
 }
 
 export interface SpatialWorld {

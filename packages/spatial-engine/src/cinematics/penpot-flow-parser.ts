@@ -6,6 +6,9 @@
 import type { PenpotFile, PenpotPage, PenpotElement, Interaction } from '@fir/penpot-parser';
 import type { PenpotFlow, PenpotConnection } from './flow-choreographer.js';
 
+// Re-export types
+export type { PenpotFlow, PenpotConnection };
+
 export interface FlowExtractionResult {
   flows: PenpotFlow[];
   connections: PenpotConnection[];

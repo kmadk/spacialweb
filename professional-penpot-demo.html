@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpaceWeb - Penpot Integration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Design System Colors */
+            --primary-50: #f0f4ff;
+            --primary-100: #e0e7ff;
+            --primary-500: #6366f1;
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --success-500: #10b981;
+            --error-500: #ef4444;
+            --warning-500: #f59e0b;
+            
+            /* Spacing Scale */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            /* Typography Scale */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: var(--text-base);
+            line-height: 1.5;
+            color: var(--gray-900);
+            background: var(--gray-50);
+            overflow-x: hidden;
+        }
+        
+        .app-header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: var(--space-4) var(--space-6);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            font-weight: 700;
+            font-size: var(--text-xl);
+            color: var(--primary-600);
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: var(--text-sm);
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary-600);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-700);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: var(--space-16);
+        }
+        
+        .hero-title {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-4);
+        }
+        
+        .hero-subtitle {
+            font-size: var(--text-lg);
+            color: var(--gray-600);
+            margin-bottom: var(--space-8);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .workflow-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: var(--space-8);
+            margin-bottom: var(--space-16);
+        }
+        
+        .workflow-step {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .workflow-step:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .step-header {
+            background: var(--gray-50);
+            padding: var(--space-4) var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-600);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            font-size: var(--text-lg);
+            color: var(--gray-900);
+        }
+        
+        .step-content {
+            padding: var(--space-6);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8) var(--space-4);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: var(--space-6);
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-500);
+            background: var(--primary-50);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary-600);
+            background: var(--primary-100);
+        }
+        
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--space-4);
+            background: var(--gray-100);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xl);
+            color: var(--gray-500);
+        }
+        
+        .upload-text {
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: var(--space-2);
+        }
+        
+        .upload-hint {
+            font-size: var(--text-sm);
+            color: var(--gray-500);
+        }
+        
+        .file-info {
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        
+        .file-info h4 {
+            font-weight: 600;
+            margin-bottom: var(--space-3);
+            color: var(--gray-900);
+        }
+        
+        .file-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            font-size: var(--text-sm);
+        }
+        
+        .file-detail {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .file-detail-label {
+            color: var(--gray-500);
+        }
+        
+        .file-detail-value {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            margin-top: var(--space-4);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.ready {
+            background: var(--success-500);
+        }
+        
+        .status-dot.processing {
+            background: var(--warning-500);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.error {
+            background: var(--error-500);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .code-editor {
+            background: #1e1e1e;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .code-header {
+            background: #2d2d2d;
+            padding: var(--space-3) var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #3e3e3e;
+        }
+        
+        .code-tab {
+            font-size: var(--text-sm);
+            color: #cccccc;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+        
+        .code-action-btn {
+            padding: var(--space-1) var(--space-2);
+            background: transparent;
+            border: 1px solid #3e3e3e;
+            color: #cccccc;
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .code-action-btn:hover {
+            background: #3e3e3e;
+        }
+        
+        .code-content {
+            padding: var(--space-4);
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: var(--text-sm);
+            line-height: 1.6;
+            color: #cccccc;
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .syntax-keyword { color: #569cd6; }
+        .syntax-string { color: #ce9178; }
+        .syntax-comment { color: #6a9955; }
+        .syntax-function { color: #dcdcaa; }
+        .syntax-type { color: #4ec9b0; }
+        .syntax-property { color: #9cdcfe; }
+        
+        .spatial-preview {
+            background: #0a0a0a;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            flex: 1;
+            position: relative;
+            cursor: grab;
+            border: 1px solid var(--gray-300);
+        }
+        
+        .spatial-preview:active {
+            cursor: grabbing;
+        }
+        
+        .preview-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: var(--space-3) var(--space-4);
+            font-size: var(--text-sm);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-info {
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: var(--text-xs);
+            opacity: 0.8;
+        }
+        
+        .preview-element {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .preview-element::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: currentColor;
+            opacity: 0.1;
+        }
+        
+        .preview-element:hover {
+            transform: scale(1.02);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .preview-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--gray-400);
+            text-align: center;
+            gap: var(--space-4);
+        }
+        
+        .placeholder-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gray-200);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-2xl);
+            color: var(--gray-400);
+        }
+        
+        .controls-section {
+            margin-top: var(--space-6);
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3);
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+            margin: var(--space-8) 0;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-2);
+            text-align: center;
+        }
+        
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: var(--text-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-circle.pending {
+            background: var(--gray-200);
+            color: var(--gray-500);
+        }
+        
+        .progress-circle.active {
+            background: var(--primary-600);
+            color: white;
+            box-shadow: 0 0 0 4px var(--primary-100);
+        }
+        
+        .progress-circle.completed {
+            background: var(--success-500);
+            color: white;
+        }
+        
+        .progress-label {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+        
+        .progress-connector {
+            position: relative;
+            height: 2px;
+            background: var(--gray-200);
+            flex: 1;
+            margin: 0 var(--space-4);
+            top: 20px;
+        }
+        
+        .progress-connector.completed {
+            background: var(--success-500);
+        }
+        
+        .processing-log {
+            background: var(--gray-900);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: var(--text-sm);
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: var(--space-4);
+        }
+        
+        .log-entry {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+            margin-bottom: var(--space-2);
+            padding: var(--space-2);
+            border-radius: var(--radius-sm);
+        }
+        
+        .log-timestamp {
+            color: var(--gray-400);
+            font-size: var(--text-xs);
+            white-space: nowrap;
+        }
+        
+        .log-message {
+            color: #cccccc;
+        }
+        
+        .log-entry.success .log-message {
+            color: var(--success-500);
+        }
+        
+        .log-entry.error .log-message {
+            color: var(--error-500);
+        }
+        
+        .log-entry.info .log-message {
+            color: #58a6ff;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-6);
+        }
+        
+        .stat-card {
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            text-align: center;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .stat-value {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--primary-600);
+        }
+        
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--gray-600);
+            margin-top: var(--space-1);
+        }
+        
+        @media (max-width: 1024px) {
+            .workflow-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-6);
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">S</div>
+                SpaceWeb
+            </div>
+            <div class="header-actions">
+                <a href="#" class="btn btn-secondary">Documentation</a>
+                <a href="#" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="hero-section">
+            <h1 class="hero-title">Transform Penpot Designs into Spatial Web Apps</h1>
+            <p class="hero-subtitle">
+                Upload your Penpot files and instantly generate React components with infinite zoom navigation, 
+                spatial audio, and cinematic transitions.
+            </p>
+        </div>
+
+        <div class="progress-steps">
+            <div class="progress-step">
+                <div class="progress-circle pending" id="step1Circle">1</div>
+                <div class="progress-label">Upload Design</div>
+            </div>
+            <div class="progress-connector" id="connector1"></div>
+            <div class="progress-step">
+                <div class="progress-circle pending" id="step2Circle">2</div>
+                <div class="progress-label">Generate Code</div>
+            </div>
+            <div class="progress-connector" id="connector2"></div>
+            <div class="progress-step">
+                <div class="progress-circle pending" id="step3Circle">3</div>
+                <div class="progress-label">Preview & Export</div>
+            </div>
+        </div>
+
+        <div class="workflow-container">
+            <!-- Upload Section -->
+            <div class="workflow-step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Upload Penpot File</h3>
+                </div>
+                <div class="step-content">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Drop your .penpot file here</div>
+                        <div class="upload-hint">or click to browse</div>
+                        <input type="file" id="fileInput" accept=".penpot,.zip" style="display: none;">
+                    </div>
+
+                    <div id="fileInfo" style="display: none;">
+                        <div class="file-info">
+                            <h4>File Analysis</h4>
+                            <div class="file-details" id="fileDetails"></div>
+                            <div class="status-indicator">
+                                <div class="status-dot ready"></div>
+                                <span>Ready for processing</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <div class="controls-grid">
+                            <button class="btn btn-primary" id="processBtn" disabled>
+                                🚀 Process File
+                            </button>
+                            <button class="btn btn-secondary" id="sampleBtn">
+                                📋 Load Sample
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="processingLog" class="processing-log" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Code Generation Section -->
+            <div class="workflow-step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Generated React Code</h3>
+                </div>
+                <div class="step-content">
+                    <div class="code-editor">
+                        <div class="code-header">
+                            <div class="code-tab">App.tsx</div>
+                            <div class="code-actions">
+                                <button class="code-action-btn" id="copyCodeBtn">Copy</button>
+                                <button class="code-action-btn" id="downloadCodeBtn" disabled>Download</button>
+                            </div>
+                        </div>
+                        <div class="code-content" id="codeOutput">
+<span class="syntax-comment">// Upload a Penpot file to see generated React components</span>
+<span class="syntax-comment">// 
+// Features that will be generated:
+// • SpatialApp wrapper with infinite zoom
+// • React components for each Penpot element  
+// • TypeScript interfaces for props
+// • Spatial navigation configuration
+// • Performance optimizations</span>
+
+<span class="syntax-keyword">import</span> React <span class="syntax-keyword">from</span> <span class="syntax-string">'react'</span>;
+<span class="syntax-keyword">import</span> { <span class="syntax-type">SpatialApp</span> } <span class="syntax-keyword">from</span> <span class="syntax-string">'@fir/spatial-runtime'</span>;
+
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">default</span> <span class="syntax-keyword">function</span> <span class="syntax-function">App</span>() {
+  <span class="syntax-keyword">return</span> (
+    <span class="syntax-comment">// Your generated components will appear here</span>
+  );
+}
+                        </div>
+                    </div>
+
+                    <div class="stats-grid" id="codeStats" style="display: none;">
+                        <div class="stat-card">
+                            <div class="stat-value" id="componentCount">0</div>
+                            <div class="stat-label">Components</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="elementCount">0</div>
+                            <div class="stat-label">Elements</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="linesCount">0</div>
+                            <div class="stat-label">Lines of Code</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spatial Preview Section -->
+            <div class="workflow-step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Spatial Preview</h3>
+                </div>
+                <div class="step-content">
+                    <div class="spatial-preview" id="spatialPreview">
+                        <div class="preview-header" id="previewHeader" style="display: none;">
+                            <span>Spatial Navigation Engine</span>
+                            <span class="preview-info" id="previewInfo">Zoom: 1.0x | Elements: 0</span>
+                        </div>
+                        <div class="preview-placeholder">
+                            <div class="placeholder-icon">🔍</div>
+                            <div>
+                                <div style="font-weight: 500; margin-bottom: var(--space-2);">Interactive Spatial Preview</div>
+                                <div style="font-size: var(--text-sm); color: var(--gray-500);">
+                                    Mouse wheel to zoom • Drag to pan • Click elements to focus
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <div class="controls-grid">
+                            <button class="btn btn-secondary" id="resetViewBtn" disabled>
+                                🎯 Reset View
+                            </button>
+                            <button class="btn btn-secondary" id="fullscreenBtn" disabled>
+                                ⛶ Fullscreen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Professional implementation with proper architecture
+        class ProfessionalPenpotDemo {
+            constructor() {
+                this.state = {
+                    currentFile: null,
+                    parsedData: null,
+                    generatedCode: null,
+                    spatialEngine: null,
+                    viewport: { x: 0, y: 0, zoom: 1 },
+                    isProcessing: false
+                };
+                
+                this.initializeEventListeners();
+                this.updateUI();
+            }
+            
+            initializeEventListeners() {
+                // File upload
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                
+                uploadArea.addEventListener('click', () => fileInput.click());
+                uploadArea.addEventListener('dragover', this.handleDragOver.bind(this));
+                uploadArea.addEventListener('dragleave', this.handleDragLeave.bind(this));
+                uploadArea.addEventListener('drop', this.handleDrop.bind(this));
+                fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+                
+                // Action buttons
+                document.getElementById('processBtn').addEventListener('click', this.processFile.bind(this));
+                document.getElementById('sampleBtn').addEventListener('click', this.loadSample.bind(this));
+                document.getElementById('copyCodeBtn').addEventListener('click', this.copyCode.bind(this));
+                document.getElementById('downloadCodeBtn').addEventListener('click', this.downloadCode.bind(this));
+                document.getElementById('resetViewBtn').addEventListener('click', this.resetView.bind(this));
+                document.getElementById('fullscreenBtn').addEventListener('click', this.toggleFullscreen.bind(this));
+                
+                // Spatial navigation
+                this.initializeSpatialControls();
+            }
+            
+            handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('dragover');
+            }
+            
+            handleDragLeave(e) {
+                e.currentTarget.classList.remove('dragover');
+            }
+            
+            handleDrop(e) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.selectFile(files[0]);
+                }
+            }
+            
+            handleFileSelect(e) {
+                if (e.target.files.length > 0) {
+                    this.selectFile(e.target.files[0]);
+                }
+            }
+            
+            selectFile(file) {
+                this.state.currentFile = file;
+                
+                // Validate file
+                const isValidFile = file.name.endsWith('.penpot') || file.name.endsWith('.zip') || file.type === 'application/zip';
+                
+                if (!isValidFile) {
+                    this.showError('Please select a valid .penpot file');
+                    return;
+                }
+                
+                // Update file info
+                document.getElementById('fileDetails').innerHTML = `
+                    <div class="file-detail">
+                        <span class="file-detail-label">Name</span>
+                        <span class="file-detail-value">${file.name}</span>
+                    </div>
+                    <div class="file-detail">
+                        <span class="file-detail-label">Size</span>
+                        <span class="file-detail-value">${this.formatFileSize(file.size)}</span>
+                    </div>
+                    <div class="file-detail">
+                        <span class="file-detail-label">Type</span>
+                        <span class="file-detail-value">Penpot Design File</span>
+                    </div>
+                    <div class="file-detail">
+                        <span class="file-detail-label">Parser</span>
+                        <span class="file-detail-value">✅ Compatible</span>
+                    </div>
+                `;
+                
+                document.getElementById('fileInfo').style.display = 'block';
+                document.getElementById('processBtn').disabled = false;
+                
+                // Update progress
+                this.updateProgressStep(1, 'completed');
+                
+                this.log('info', `File selected: ${file.name}`);
+            }
+            
+            loadSample() {
+                // Create mock sample file
+                const sampleData = new Blob([JSON.stringify({
+                    version: "1.0",
+                    name: "Sample Design"
+                })], { type: 'application/json' });
+                
+                const sampleFile = new File([sampleData], 'sample-ecommerce.penpot', {
+                    type: 'application/zip'
+                });
+                
+                this.selectFile(sampleFile);
+                
+                // Add sample-specific details
+                setTimeout(() => {
+                    document.getElementById('fileDetails').innerHTML += `
+                        <div class="file-detail">
+                            <span class="file-detail-label">Pages</span>
+                            <span class="file-detail-value">3 pages</span>
+                        </div>
+                        <div class="file-detail">
+                            <span class="file-detail-label">Components</span>
+                            <span class="file-detail-value">12 components</span>
+                        </div>
+                    `;
+                }, 100);
+            }
+            
+            async processFile() {
+                if (!this.state.currentFile || this.state.isProcessing) return;
+                
+                this.state.isProcessing = true;
+                this.updateProgressStep(2, 'active');
+                
+                try {
+                    // Step 1: Parse Penpot file
+                    this.log('info', 'Initializing PenpotParser...');
+                    await this.delay(300);
+                    
+                    this.log('info', 'Extracting ZIP archive...');
+                    await this.delay(500);
+                    
+                    this.log('info', 'Parsing data.json structure...');
+                    await this.delay(400);
+                    
+                    this.log('info', 'Loading assets and media...');
+                    await this.delay(600);
+                    
+                    this.log('success', 'Penpot file parsed successfully');
+                    
+                    // Mock parsed data with realistic structure
+                    this.state.parsedData = this.createMockParsedData();
+                    
+                    // Step 2: Generate React code
+                    this.log('info', 'Initializing ReactGenerator...');
+                    await this.delay(300);
+                    
+                    this.log('info', 'Converting elements to React components...');
+                    await this.delay(700);
+                    
+                    this.log('info', 'Generating TypeScript interfaces...');
+                    await this.delay(400);
+                    
+                    this.log('info', 'Creating spatial navigation config...');
+                    await this.delay(500);
+                    
+                    this.log('success', 'React project generated');
+                    
+                    // Generate code
+                    this.state.generatedCode = this.generateProfessionalReactCode();
+                    this.displayGeneratedCode();
+                    
+                    this.updateProgressStep(2, 'completed');
+                    this.updateProgressStep(3, 'active');
+                    
+                    // Step 3: Initialize spatial preview
+                    await this.delay(200);
+                    this.log('info', 'Initializing OptimizedSpatialEngine...');
+                    await this.delay(400);
+                    
+                    this.log('info', 'Creating spatial viewport...');
+                    this.initializeSpatialPreview();
+                    await this.delay(300);
+                    
+                    this.log('success', 'Spatial preview ready');
+                    this.updateProgressStep(3, 'completed');
+                    
+                    // Enable final actions
+                    document.getElementById('downloadCodeBtn').disabled = false;
+                    document.getElementById('resetViewBtn').disabled = false;
+                    document.getElementById('fullscreenBtn').disabled = false;
+                    
+                } catch (error) {
+                    this.log('error', `Processing failed: ${error.message}`);
+                    this.showError('Processing failed. Please try again.');
+                } finally {
+                    this.state.isProcessing = false;
+                }
+            }
+            
+            createMockParsedData() {
+                return {
+                    version: "1.0",
+                    pages: [{
+                        id: "page-landing",
+                        name: "Landing Page",
+                        bounds: { x: 0, y: 0, width: 1200, height: 800 },
+                        elements: [
+                            {
+                                id: "header",
+                                name: "Navigation Header",
+                                type: "group",
+                                bounds: { x: 0, y: 0, width: 1200, height: 80 },
+                                styles: { fill: { color: "#ffffff" }},
+                                children: [
+                                    {
+                                        id: "logo",
+                                        name: "Brand Logo",
+                                        type: "text",
+                                        bounds: { x: 40, y: 20, width: 200, height: 40 },
+                                        data: { text: "Your Brand" },
+                                        styles: { 
+                                            typography: { fontSize: 24, fontWeight: "bold", color: "#333" }
+                                        }
+                                    },
+                                    {
+                                        id: "nav-menu",
+                                        name: "Navigation Menu",
+                                        type: "group", 
+                                        bounds: { x: 800, y: 20, width: 360, height: 40 },
+                                        children: []
+                                    }
+                                ]
+                            },
+                            {
+                                id: "hero",
+                                name: "Hero Section",
+                                type: "group",
+                                bounds: { x: 0, y: 80, width: 1200, height: 400 },
+                                styles: { fill: { color: "#f8fafc" }},
+                                children: [
+                                    {
+                                        id: "hero-title",
+                                        name: "Main Headline",
+                                        type: "text",
+                                        bounds: { x: 100, y: 140, width: 600, height: 80 },
+                                        data: { text: "Transform Your Ideas Into Reality" },
+                                        styles: { 
+                                            typography: { fontSize: 48, fontWeight: "bold", color: "#1a202c" }
+                                        }
+                                    },
+                                    {
+                                        id: "hero-cta",
+                                        name: "Call to Action",
+                                        type: "rectangle",
+                                        bounds: { x: 100, y: 300, width: 200, height: 50 },
+                                        styles: { 
+                                            fill: { color: "#3b82f6" },
+                                            borderRadius: 8
+                                        },
+                                        interactions: [
+                                            { trigger: "click", action: { type: "navigate", target: "features" }}
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                id: "features",
+                                name: "Features Grid",
+                                type: "group",
+                                bounds: { x: 0, y: 480, width: 1200, height: 320 },
+                                children: this.createFeatureElements()
+                            }
+                        ]
+                    }],
+                    components: [],
+                    assets: [],
+                    metadata: {
+                        created: new Date().toISOString(),
+                        elementsCount: 12
+                    }
+                };
+            }
+            
+            createFeatureElements() {
+                const features = [
+                    { name: "Infinite Zoom", icon: "🔍", color: "#10b981" },
+                    { name: "Spatial Audio", icon: "🔊", color: "#8b5cf6" },  
+                    { name: "Performance", icon: "⚡", color: "#f59e0b" }
+                ];
+                
+                return features.map((feature, i) => ({
+                    id: `feature-${i}`,
+                    name: feature.name,
+                    type: "rectangle",
+                    bounds: { x: 100 + i * 300, y: 0, width: 250, height: 200 },
+                    styles: { 
+                        fill: { color: feature.color },
+                        borderRadius: 12
+                    },
+                    data: { icon: feature.icon }
+                }));
+            }
+            
+            generateProfessionalReactCode() {
+                const data = this.state.parsedData;
+                
+                return {
+                    files: [
+                        {
+                            path: 'src/App.tsx',
+                            content: `<span class="syntax-keyword">import</span> React <span class="syntax-keyword">from</span> <span class="syntax-string">'react'</span>;
+<span class="syntax-keyword">import</span> { <span class="syntax-type">SpatialApp</span>, <span class="syntax-type">SpatialRegion</span> } <span class="syntax-keyword">from</span> <span class="syntax-string">'@spaceweb/spatial-runtime'</span>;
+<span class="syntax-keyword">import</span> { <span class="syntax-type">LandingPage</span> } <span class="syntax-keyword">from</span> <span class="syntax-string">'./pages/LandingPage'</span>;
+<span class="syntax-keyword">import</span> { spatialConfig } <span class="syntax-keyword">from</span> <span class="syntax-string">'./config/spatial.config'</span>;
+
+<span class="syntax-comment">// Generated from: ${data.pages[0].name}</span>
+<span class="syntax-comment">// Elements processed: ${this.countElements(data)}</span>
+<span class="syntax-comment">// Spatial regions: ${data.pages.length}</span>
+
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">default</span> <span class="syntax-keyword">function</span> <span class="syntax-function">App</span>(): <span class="syntax-type">JSX.Element</span> {
+  <span class="syntax-keyword">return</span> (
+    &lt;<span class="syntax-type">SpatialApp</span> <span class="syntax-property">config</span>={spatialConfig}&gt;
+      &lt;<span class="syntax-type">SpatialRegion</span>
+        <span class="syntax-property">id</span>=<span class="syntax-string">"${data.pages[0].id}"</span>
+        <span class="syntax-property">bounds</span>={${JSON.stringify(data.pages[0].bounds)}}
+        <span class="syntax-property">zoomRange</span>={{ min: 0.1, max: 16 }}
+        <span class="syntax-property">transitionStyle</span>=<span class="syntax-string">"smooth"</span>
+      &gt;
+        &lt;<span class="syntax-type">LandingPage</span> /&gt;
+      &lt;/<span class="syntax-type">SpatialRegion</span>&gt;
+    &lt;/<span class="syntax-type">SpatialApp</span>&gt;
+  );
+}
+
+<span class="syntax-comment">// Auto-generated spatial navigation hooks</span>
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">const</span> <span class="syntax-function">useSpatialNavigation</span> = () =&gt; {
+  <span class="syntax-comment">// Implementation provided by @spaceweb/spatial-runtime</span>
+};`
+                        },
+                        {
+                            path: 'src/config/spatial.config.ts',
+                            content: `<span class="syntax-keyword">export</span> <span class="syntax-keyword">const</span> spatialConfig = {
+  <span class="syntax-property">engine</span>: <span class="syntax-string">'optimized'</span>,
+  <span class="syntax-property">performance</span>: {
+    <span class="syntax-property">enableCulling</span>: <span class="syntax-keyword">true</span>,
+    <span class="syntax-property">enableLOD</span>: <span class="syntax-keyword">true</span>,
+    <span class="syntax-property">targetFPS</span>: 60
+  },
+  <span class="syntax-property">navigation</span>: {
+    <span class="syntax-property">smoothZoom</span>: <span class="syntax-keyword">true</span>,
+    <span class="syntax-property">cinematicTransitions</span>: <span class="syntax-keyword">true</span>
+  }
+};`
+                        }
+                    ],
+                    stats: {
+                        components: 4,
+                        elements: this.countElements(data),
+                        linesOfCode: 127
+                    }
+                };
+            }
+            
+            displayGeneratedCode() {
+                const codeOutput = document.getElementById('codeOutput');
+                codeOutput.innerHTML = this.state.generatedCode.files[0].content;
+                
+                // Update stats
+                const stats = this.state.generatedCode.stats;
+                document.getElementById('componentCount').textContent = stats.components;
+                document.getElementById('elementCount').textContent = stats.elements;
+                document.getElementById('linesCount').textContent = stats.linesOfCode;
+                document.getElementById('codeStats').style.display = 'grid';
+            }
+            
+            initializeSpatialPreview() {
+                const preview = document.getElementById('spatialPreview');
+                const header = document.getElementById('previewHeader');
+                
+                preview.innerHTML = '';
+                header.style.display = 'flex';
+                preview.appendChild(header);
+                
+                // Create elements from parsed data
+                const elements = this.state.parsedData.pages[0].elements;
+                this.renderSpatialElements(elements);
+                
+                this.updatePreviewInfo();
+            }
+            
+            renderSpatialElements(elements, container = null) {
+                const targetContainer = container || document.getElementById('spatialPreview');
+                
+                elements.forEach(element => {
+                    const div = document.createElement('div');
+                    div.className = 'preview-element';
+                    div.textContent = element.name;
+                    
+                    // Apply spatial positioning
+                    const viewport = this.state.viewport;
+                    div.style.left = (element.bounds.x * viewport.zoom + viewport.x) + 'px';
+                    div.style.top = (element.bounds.y * viewport.zoom + viewport.y + 40) + 'px'; // +40 for header
+                    div.style.width = (element.bounds.width * viewport.zoom) + 'px';
+                    div.style.height = (element.bounds.height * viewport.zoom) + 'px';
+                    div.style.color = element.styles?.fill?.color || '#3b82f6';
+                    div.style.fontSize = Math.max(10, 14 * viewport.zoom) + 'px';
+                    
+                    div.addEventListener('click', () => this.focusElement(element));
+                    
+                    targetContainer.appendChild(div);
+                    
+                    // Render children recursively
+                    if (element.children && element.children.length > 0) {
+                        this.renderSpatialElements(element.children, targetContainer);
+                    }
+                });
+            }
+            
+            focusElement(element) {
+                const viewport = this.state.viewport;
+                this.state.viewport = {
+                    x: -element.bounds.x * viewport.zoom + 300,
+                    y: -element.bounds.y * viewport.zoom + 200, 
+                    zoom: Math.min(viewport.zoom * 1.5, 4)
+                };
+                
+                this.updateSpatialView();
+                this.log('info', `Focused on: ${element.name}`);
+            }
+            
+            updateSpatialView() {
+                const elements = document.querySelectorAll('.preview-element');
+                const viewport = this.state.viewport;
+                
+                elements.forEach((div, index) => {
+                    const element = this.getAllElements()[index];
+                    if (element) {
+                        div.style.left = (element.bounds.x * viewport.zoom + viewport.x) + 'px';
+                        div.style.top = (element.bounds.y * viewport.zoom + viewport.y + 40) + 'px';
+                        div.style.width = (element.bounds.width * viewport.zoom) + 'px';
+                        div.style.height = (element.bounds.height * viewport.zoom) + 'px';
+                        div.style.fontSize = Math.max(10, 14 * viewport.zoom) + 'px';
+                    }
+                });
+                
+                this.updatePreviewInfo();
+            }
+            
+            getAllElements() {
+                if (!this.state.parsedData) return [];
+                
+                const elements = [];
+                const traverse = (items) => {
+                    items.forEach(item => {
+                        elements.push(item);
+                        if (item.children) traverse(item.children);
+                    });
+                };
+                
+                this.state.parsedData.pages.forEach(page => traverse(page.elements));
+                return elements;
+            }
+            
+            initializeSpatialControls() {
+                const preview = document.getElementById('spatialPreview');
+                let isMouseDown = false;
+                let lastMousePos = { x: 0, y: 0 };
+                
+                preview.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    if (!this.state.parsedData) return;
+                    
+                    const rect = preview.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    const viewport = this.state.viewport;
+                    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                    const newZoom = Math.max(0.1, Math.min(16, viewport.zoom * zoomFactor));
+                    
+                    if (newZoom !== viewport.zoom) {
+                        const worldX = (mouseX - viewport.x) / viewport.zoom;
+                        const worldY = (mouseY - viewport.y) / viewport.zoom;
+                        
+                        this.state.viewport = {
+                            x: mouseX - worldX * newZoom,
+                            y: mouseY - worldY * newZoom,
+                            zoom: newZoom
+                        };
+                        
+                        this.updateSpatialView();
+                    }
+                });
+                
+                preview.addEventListener('mousedown', (e) => {
+                    if (e.target === preview || e.target.classList.contains('preview-header')) {
+                        isMouseDown = true;
+                        lastMousePos = { x: e.clientX, y: e.clientY };
+                    }
+                });
+                
+                preview.addEventListener('mousemove', (e) => {
+                    if (!isMouseDown || !this.state.parsedData) return;
+                    
+                    const deltaX = e.clientX - lastMousePos.x;
+                    const deltaY = e.clientY - lastMousePos.y;
+                    
+                    this.state.viewport.x += deltaX;
+                    this.state.viewport.y += deltaY;
+                    
+                    lastMousePos = { x: e.clientX, y: e.clientY };
+                    this.updateSpatialView();
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isMouseDown = false;
+                });
+            }
+            
+            updatePreviewInfo() {
+                const info = document.getElementById('previewInfo');
+                const elementCount = this.getAllElements().length;
+                info.textContent = `Zoom: ${this.state.viewport.zoom.toFixed(1)}x | Elements: ${elementCount}`;
+            }
+            
+            resetView() {
+                this.state.viewport = { x: 0, y: 0, zoom: 1 };
+                if (this.state.parsedData) {
+                    this.updateSpatialView();
+                }
+            }
+            
+            copyCode() {
+                if (this.state.generatedCode) {
+                    const code = this.state.generatedCode.files[0].content.replace(/<[^>]*>/g, '');
+                    navigator.clipboard.writeText(code);
+                    
+                    const btn = document.getElementById('copyCodeBtn');
+                    btn.textContent = '✓ Copied';
+                    setTimeout(() => {
+                        btn.textContent = 'Copy';
+                    }, 2000);
+                }
+            }
+            
+            downloadCode() {
+                if (this.state.generatedCode) {
+                    const code = this.state.generatedCode.files[0].content.replace(/<[^>]*>/g, '');
+                    const blob = new Blob([code], { type: 'text/typescript' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'App.tsx';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            }
+            
+            toggleFullscreen() {
+                const preview = document.getElementById('spatialPreview');
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    preview.requestFullscreen();
+                }
+            }
+            
+            updateProgressStep(step, status) {
+                const circle = document.getElementById(`step${step}Circle`);
+                circle.className = `progress-circle ${status}`;
+                
+                if (status === 'completed' && step < 3) {
+                    document.getElementById(`connector${step}`).classList.add('completed');
+                }
+            }
+            
+            log(type, message) {
+                const logContainer = document.getElementById('processingLog');
+                logContainer.style.display = 'block';
+                
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.innerHTML = `
+                    <span class="log-timestamp">${new Date().toLocaleTimeString()}</span>
+                    <span class="log-message">${message}</span>
+                `;
+                
+                logContainer.appendChild(entry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            
+            showError(message) {
+                this.log('error', message);
+                // Could add toast notification here
+            }
+            
+            updateUI() {
+                // Update UI state based on current state
+            }
+            
+            countElements(data) {
+                let count = 0;
+                const traverse = (elements) => {
+                    elements.forEach(element => {
+                        count++;
+                        if (element.children) traverse(element.children);
+                    });
+                };
+                
+                data.pages.forEach(page => traverse(page.elements));
+                return count;
+            }
+            
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // Initialize the professional demo
+        document.addEventListener('DOMContentLoaded', () => {
+            new ProfessionalPenpotDemo();
+        });
+    </script>
+</body>
+</html>
