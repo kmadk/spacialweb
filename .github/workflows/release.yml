@@ -22,18 +22,15 @@ jobs:
           fetch-depth: 0
           
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+        run: npm install -g pnpm@8.15.6
           
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
           
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
         
       - name: Build packages
         run: pnpm build
