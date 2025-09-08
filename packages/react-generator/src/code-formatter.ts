@@ -63,15 +63,6 @@ export class CodeFormatter {
 
   minify(code: string, type: 'typescript' | 'css' | 'json' = 'typescript'): string {
     try {
-      const options = {
-        ...this.getFormatterOptions(type),
-        printWidth: 1000,
-        tabWidth: 0,
-        semi: false,
-        singleQuote: true,
-        trailingComma: 'none' as const,
-      };
-
       return this.basicFormat(code);
     } catch (error) {
       console.warn('Failed to minify code:', error);
@@ -81,7 +72,7 @@ export class CodeFormatter {
 
   validateSyntax(code: string, type: 'typescript' | 'css' | 'json' = 'typescript'): boolean {
     try {
-      this.formatSync(code, type);
+      this.formatSync(code);
       return true;
     } catch {
       return false;

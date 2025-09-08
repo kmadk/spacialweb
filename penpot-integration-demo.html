@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penpot → Spatial React Demo</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .demo-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #1a1a1a;
+            display: flex;
+        }
+
+        .pipeline-section {
+            flex: 1;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .pipeline-section:last-child {
+            border-right: none;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .code-output {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .spatial-preview {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .spatial-preview:active {
+            cursor: grabbing;
+        }
+
+        .preview-element {
+            position: absolute;
+            background: #4ECDC4;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .preview-element:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            background: rgba(102, 126, 234, 0.8);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: rgba(102, 126, 234, 1);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .processing {
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 10px;
+        }
+
+        .step.active .step-icon {
+            background: #667eea;
+        }
+
+        .step.completed .step-icon {
+            background: #4ECDC4;
+        }
+
+        .arrow {
+            color: rgba(255, 255, 255, 0.3);
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Upload Section -->
+        <div class="pipeline-section">
+            <h2 class="section-title">📁 Upload Penpot File</h2>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📎</div>
+                <div>Drop your .penpot file here</div>
+                <div style="font-size: 12px; opacity: 0.7; margin-top: 8px;">
+                    or click to browse
+                </div>
+                <input type="file" id="fileInput" accept=".penpot,.zip" style="display: none;">
+            </div>
+
+            <div id="fileInfo" style="display: none;">
+                <h4>📄 File Information</h4>
+                <div id="fileDetails"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" id="processBtn" disabled>🚀 Process File</button>
+                <button class="btn" id="sampleBtn">📋 Load Sample</button>
+            </div>
+        </div>
+
+        <!-- Processing Section -->
+        <div class="pipeline-section">
+            <h2 class="section-title">⚙️ Generated React Code</h2>
+
+            <div class="step-indicator">
+                <div class="step" id="step1">
+                    <div class="step-icon">1</div>
+                    <span>Parse</span>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step" id="step2">
+                    <div class="step-icon">2</div>
+                    <span>Generate</span>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step" id="step3">
+                    <div class="step-icon">3</div>
+                    <span>Spatial</span>
+                </div>
+            </div>
+
+            <div class="code-output" id="codeOutput">
+// Generated React components will appear here...
+// This demonstrates the Penpot → React pipeline
+
+import React from 'react';
+import { SpatialRegion } from '@fir/spatial-runtime';
+
+export default function GeneratedComponent() {
+  return (
+    &lt;SpatialRegion&gt;
+      {/* Your Penpot elements become React components */}
+    &lt;/SpatialRegion&gt;
+  );
+}
+            </div>
+
+            <div class="controls">
+                <button class="btn" id="downloadBtn" disabled>💾 Download Code</button>
+                <button class="btn" id="copyBtn" disabled>📋 Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="pipeline-section">
+            <h2 class="section-title">🔍 Spatial Navigation Preview</h2>
+            
+            <div class="spatial-preview" id="spatialPreview">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; opacity: 0.5;">
+                    Select a file to see spatial navigation preview
+                </div>
+            </div>
+
+            <div style="font-size: 11px; opacity: 0.7; margin-top: 10px; text-align: center;">
+                • Mouse wheel: zoom • Click + drag: pan • Click elements: focus
+            </div>
+
+            <div class="controls">
+                <button class="btn" id="resetViewBtn">🎯 Reset View</button>
+                <button class="btn" id="fullPreviewBtn" disabled>🌐 Open Full Preview</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo state
+        let processedElements = [];
+        let viewport = { x: 0, y: 0, zoom: 1 };
+
+        // DOM elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileDetails = document.getElementById('fileDetails');
+        const processBtn = document.getElementById('processBtn');
+        const sampleBtn = document.getElementById('sampleBtn');
+        const codeOutput = document.getElementById('codeOutput');
+        const spatialPreview = document.getElementById('spatialPreview');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const resetViewBtn = document.getElementById('resetViewBtn');
+        const fullPreviewBtn = document.getElementById('fullPreviewBtn');
+
+        // File upload handling
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFileSelect(files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFileSelect(e.target.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            fileDetails.innerHTML = `
+                <strong>Name:</strong> ${file.name}<br>
+                <strong>Size:</strong> ${(file.size / 1024).toFixed(1)} KB<br>
+                <strong>Type:</strong> ${file.type || 'Penpot/Zip file'}
+            `;
+            fileInfo.style.display = 'block';
+            processBtn.disabled = false;
+            
+            console.log('📁 File selected:', file.name);
+        }
+
+        // Sample data loading
+        sampleBtn.addEventListener('click', () => {
+            fileDetails.innerHTML = `
+                <strong>Name:</strong> sample-design.penpot<br>
+                <strong>Size:</strong> 156.4 KB<br>
+                <strong>Type:</strong> Sample Penpot Design<br>
+                <strong>Elements:</strong> 12 components, 3 pages
+            `;
+            fileInfo.style.display = 'block';
+            processBtn.disabled = false;
+            
+            console.log('📋 Sample file loaded');
+        });
+
+        // Processing pipeline
+        processBtn.addEventListener('click', async () => {
+            await simulateProcessing();
+        });
+
+        async function simulateProcessing() {
+            processBtn.disabled = true;
+            processBtn.textContent = '⏳ Processing...';
+            
+            // Step 1: Parse
+            document.getElementById('step1').classList.add('active');
+            codeOutput.textContent = '// 📖 Parsing Penpot file structure...\\n// Extracting elements, styles, interactions...';
+            await delay(1000);
+            
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            
+            // Step 2: Generate React Code
+            document.getElementById('step2').classList.add('active');
+            codeOutput.textContent = generateSampleReactCode();
+            await delay(1500);
+            
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step2').classList.add('completed');
+            
+            // Step 3: Create Spatial Layout
+            document.getElementById('step3').classList.add('active');
+            createSpatialPreview();
+            await delay(1000);
+            
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('step3').classList.add('completed');
+            
+            // Enable download/copy
+            downloadBtn.disabled = false;
+            copyBtn.disabled = false;
+            fullPreviewBtn.disabled = false;
+            
+            processBtn.textContent = '✅ Processing Complete';
+            
+            console.log('🚀 Processing pipeline completed');
+        }
+
+        function generateSampleReactCode() {
+            return `import React from 'react';
+import { SpatialApp, SpatialRegion } from '@fir/spatial-runtime';
+
+// Generated from your Penpot design
+export default function YourDesign() {
+  return (
+    <SpatialApp>
+      <SpatialRegion
+        id="landing-page"
+        layout="hero-journey"
+        bounds={{ x: 0, y: 0, width: 1200, height: 800 }}
+      >
+        <HeaderComponent
+          title="Welcome to FIR Spatial"
+          style={{
+            position: 'absolute',
+            x: 100, y: 50,
+            width: 1000, height: 120
+          }}
+          onClick={() => navigateTo('hero-details')}
+        />
+        
+        <FeatureGrid
+          items={[
+            { name: 'Infinite Zoom', icon: '🔍' },
+            { name: 'Spatial Audio', icon: '🔊' },
+            { name: 'Cinematic Flow', icon: '🎬' }
+          ]}
+          layout="grid-3x2"
+          spatialTransition="playful-bounce"
+        />
+        
+        <CallToAction
+          text="Get Started"
+          destination="onboarding-flow"
+          transitionStyle="dramatic-zoom"
+        />
+      </SpatialRegion>
+    </SpatialApp>
+  );
+}
+
+// Spatial navigation configuration
+export const spatialConfig = {
+  worlds: ['landing', 'features', 'pricing'],
+  connections: [
+    { from: 'landing', to: 'features', style: 'cinematic' },
+    { from: 'features', to: 'pricing', style: 'professional' }
+  ],
+  audio: { enabled: true, theme: 'ambient' }
+};`;
+        }
+
+        function createSpatialPreview() {
+            const elements = [
+                { name: 'Header', x: 50, y: 30, width: 200, height: 40, color: '#4ECDC4' },
+                { name: 'Feature A', x: 30, y: 100, width: 80, height: 60, color: '#45B7D1' },
+                { name: 'Feature B', x: 130, y: 100, width: 80, height: 60, color: '#96CEB4' },
+                { name: 'Feature C', x: 230, y: 100, width: 80, height: 60, color: '#FFEAA7' },
+                { name: 'CTA Button', x: 125, y: 190, width: 90, height: 35, color: '#FF6B6B' }
+            ];
+            
+            processedElements = elements;
+            renderSpatialPreview();
+        }
+
+        function renderSpatialPreview() {
+            spatialPreview.innerHTML = '';
+            
+            processedElements.forEach(element => {
+                const div = document.createElement('div');
+                div.className = 'preview-element';
+                div.textContent = element.name;
+                div.style.left = (element.x + viewport.x) * viewport.zoom + 'px';
+                div.style.top = (element.y + viewport.y) * viewport.zoom + 'px';
+                div.style.width = element.width * viewport.zoom + 'px';
+                div.style.height = element.height * viewport.zoom + 'px';
+                div.style.background = element.color;
+                div.style.fontSize = Math.max(8, 11 * viewport.zoom) + 'px';
+                
+                div.addEventListener('click', () => {
+                    console.log(`🎯 Clicked: ${element.name}`);
+                    // Focus on element
+                    viewport.x = -element.x + 150;
+                    viewport.y = -element.y + 100;
+                    viewport.zoom = Math.min(viewport.zoom * 1.5, 3);
+                    renderSpatialPreview();
+                });
+                
+                spatialPreview.appendChild(div);
+            });
+        }
+
+        // Spatial navigation controls
+        let isMouseDown = false;
+        let lastMousePos = { x: 0, y: 0 };
+
+        spatialPreview.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (processedElements.length === 0) return;
+            
+            const rect = spatialPreview.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            const newZoom = Math.max(0.2, Math.min(4, viewport.zoom * zoomFactor));
+            
+            if (newZoom !== viewport.zoom) {
+                const worldX = (mouseX - viewport.x) / viewport.zoom;
+                const worldY = (mouseY - viewport.y) / viewport.zoom;
+                
+                viewport.x = mouseX - worldX * newZoom;
+                viewport.y = mouseY - worldY * newZoom;
+                viewport.zoom = newZoom;
+                
+                renderSpatialPreview();
+            }
+        });
+
+        spatialPreview.addEventListener('mousedown', (e) => {
+            if (e.target === spatialPreview) {
+                isMouseDown = true;
+                lastMousePos = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        spatialPreview.addEventListener('mousemove', (e) => {
+            if (!isMouseDown || processedElements.length === 0) return;
+            
+            const deltaX = e.clientX - lastMousePos.x;
+            const deltaY = e.clientY - lastMousePos.y;
+            
+            viewport.x += deltaX;
+            viewport.y += deltaY;
+            
+            lastMousePos = { x: e.clientX, y: e.clientY };
+            renderSpatialPreview();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isMouseDown = false;
+        });
+
+        // Control buttons
+        resetViewBtn.addEventListener('click', () => {
+            viewport = { x: 0, y: 0, zoom: 1 };
+            if (processedElements.length > 0) renderSpatialPreview();
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const blob = new Blob([codeOutput.textContent], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated-spatial-component.tsx';
+            a.click();
+            URL.revokeObjectURL(url);
+            console.log('💾 Code downloaded');
+        });
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(codeOutput.textContent);
+            copyBtn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = '📋 Copy to Clipboard';
+            }, 2000);
+        });
+
+        fullPreviewBtn.addEventListener('click', () => {
+            window.open('spatial-demo.html', '_blank');
+        });
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        console.log('🎬 Penpot → Spatial React Demo Ready');
+    </script>
+</body>
+</html>
