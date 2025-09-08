@@ -150,12 +150,17 @@ For complete documentation, see [Cinematic System Guide](CINEMATIC_SYSTEM.md).
 - [x] Cinematic movement system
 - [x] Comprehensive test coverage
 
+### Current (v1.1) - NEW ✨
+- [x] **3D Spatial Navigation** - Z-axis exploration with depth layers
+- [x] **Plugin System** - Extensible spatial behaviors and custom logic
+- [x] **Advanced 3D Culling** - Frustum culling, occlusion detection, distance LOD
+- [x] **Interactive Controls** - Keyboard, mouse, touch, and UI controls for 3D navigation
+
 ### Upcoming
 - [ ] Real-time collaboration
-- [ ] Plugin system
-- [ ] 3D spatial navigation
 - [ ] WebGPU rendering
 - [ ] VR/AR support
+- [ ] Physics-based interactions
 
 ## License
 
