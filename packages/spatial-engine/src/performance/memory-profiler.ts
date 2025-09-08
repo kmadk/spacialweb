@@ -68,7 +68,7 @@ export class MemoryProfiler {
     this.isMonitoring = true;
     this.takeSnapshot();
     
-    this.monitoringInterval = window.setInterval(() => {
+    this.monitoringInterval = (typeof window !== 'undefined' ? window : global as any).setInterval(() => {
       this.takeSnapshot();
     }, this.samplingInterval);
   }
@@ -235,7 +235,7 @@ export class MemoryProfiler {
    * Force garbage collection (if available)
    */
   public forceGC(): void {
-    if ((window as any).gc) {
+    if (typeof window !== 'undefined' && (window as any).gc) {
       (window as any).gc();
     } else if (typeof global !== 'undefined' && (global as any).gc) {
       (global as any).gc();
@@ -263,13 +263,13 @@ export class MemoryProfiler {
 
   private setupDefaultMetrics(): void {
     // DOM element count
-    this.addCustomMetric('domElements', () => document.getElementsByTagName('*').length);
+    this.addCustomMetric('domElements', () => typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0);
     
     // Event listeners (approximate)
     this.addCustomMetric('eventListeners', () => this.estimateEventListeners());
     
     // Canvas contexts
-    this.addCustomMetric('canvasContexts', () => document.querySelectorAll('canvas').length);
+    this.addCustomMetric('canvasContexts', () => typeof document !== 'undefined' ? document.querySelectorAll('canvas').length : 0);
   }
 
   private analyzeMemoryGrowth(snapshots: MemorySnapshot[]): {
@@ -401,6 +401,8 @@ export class MemoryProfiler {
   }
 
   private estimateEventListeners(): number {
+    if (typeof document === 'undefined') return 0;
+    
     // This is an approximation since there's no direct way to count event listeners
     let count = 0;
     

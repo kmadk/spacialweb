@@ -197,8 +197,8 @@ export class HierarchicalSpatialIndex {
     }
     
     // Restore original order
-    for (const { index } of sortedQueries) {
-      results[index] = sortedResults[results.length];
+    for (let i = 0; i < sortedQueries.length; i++) {
+      results[sortedQueries[i].index] = sortedResults[i];
     }
     
     return results;
