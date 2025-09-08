@@ -1,8 +1,8 @@
-# FIR Spatial Web
+# Spatial Web
 
-Transform Penpot design files into infinite-zoom spatial web applications that directly match your designs - no more pagination, just smooth spatial navigation.
+Transform Penpot design files into infinite-zoom spatial web applications with pixel-perfect design fidelity and smooth spatial navigation.
 
-> **True Design Fidelity**: Penpot's web-native approach enables direct CSS property mapping, allowing perfect design-to-code translation with spatial navigation replacing traditional page flows.
+> Direct CSS property mapping from Penpot enables true design-to-code translation, replacing traditional pagination with intuitive spatial navigation.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)
@@ -36,30 +36,34 @@ No translation layer. No interpretation. Pure CSS property preservation.
 - Adaptive frame budgeting maintains smooth interactions
 - Level-of-detail optimization for massive datasets
 
-## Quick Demo
+## Quick Start
 
-**Try immediately:**
+### Try the Demo
 ```bash
-# Just open the demo file in your browser
 open spatial-demo.html
 ```
 
-**Core features:**
-- Infinite Zoom Navigation - Smooth spatial movement replacing pagination
-- 60fps Performance - Maintained across all zoom levels  
-- Direct Flow Mapping - Penpot connections become spatial navigation
-- Responsive Design - Works seamlessly across devices
-
-**Optional cinematic enhancements:**
-- Advanced narrative layouts for storytelling
-- Emotional movement styles for presentations
-- 3D spatial audio for immersive experiences
-
-**Development setup:**
+### Install
 ```bash
-# For full development environment
-pnpm install && pnpm run build
-cd packages/spatial-engine && npm run dev
+npm install @spacialweb/spatial-engine @spacialweb/penpot-parser
+```
+
+### Basic Usage
+```typescript
+import { OptimizedSpatialEngine, PenpotFlowParser } from '@spacialweb/spatial-engine';
+
+const parser = new PenpotFlowParser();
+const { flows } = parser.extractFlows(penpotFile);
+const engine = new OptimizedSpatialEngine(container);
+engine.loadWorld(spatialWorld);
+```
+
+### Development
+```bash
+git clone https://github.com/spacialweb/spatial-web.git
+cd spatial-web
+pnpm install && pnpm build
+pnpm dev
 ```
 
 ## Performance Benchmarks
@@ -112,11 +116,11 @@ pnpm type-check   # Verify TypeScript
 
 Each package is independently versioned and published to npm:
 
-- [`@fir/penpot-parser`](./packages/penpot-parser) - Parse Penpot design files with direct CSS mapping
-- [`@fir/spatial-engine`](./packages/spatial-engine) - High-performance WebGL spatial navigation
-- [`@fir/react-generator`](./packages/react-generator) - Generate functional React components  
-- [`@fir/spatial-runtime`](./packages/spatial-runtime) - React spatial navigation components
-- [`@fir/spatial-cli`](./packages/spatial-cli) - Command-line interface for workflows
+- [`@spacialweb/penpot-parser`](./packages/penpot-parser) - Parse Penpot design files with direct CSS mapping
+- [`@spacialweb/spatial-engine`](./packages/spatial-engine) - High-performance WebGL spatial navigation
+- [`@spacialweb/react-generator`](./packages/react-generator) - Generate functional React components  
+- [`@spacialweb/spatial-runtime`](./packages/spatial-runtime) - React spatial navigation components
+- [`@spacialweb/spatial-cli`](./packages/spatial-cli) - Command-line interface for workflows
 
 ## Contributing
 
@@ -189,6 +193,6 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ---
 
-Built by the FIR Spatial Team
+Built by the Spatial Web Team
 
-[Star us on GitHub](https://github.com/fir-spatial/spatial-web) | [Documentation](https://docs.fir-spatial.dev) | [Discussions](https://github.com/fir-spatial/spatial-web/discussions)
+[Star us on GitHub](https://github.com/spacialweb/spatial-web) | [Documentation](https://docs.spacialweb.dev) | [Discussions](https://github.com/spacialweb/spatial-web/discussions)

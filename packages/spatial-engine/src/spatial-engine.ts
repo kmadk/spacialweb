@@ -9,10 +9,14 @@ import type {
   TransitionOptions,
   PerformanceMetrics,
   EventMap,
+  ZNavigationOptions,
+  SpatialLayer,
 } from './types.js';
 import type { BoundingBox } from '@fir/penpot-parser';
 import { LODManager } from './lod-manager.js';
 import { TransitionManager } from './transition-manager.js';
+import { ZNavigationManager } from './z-navigation-manager.js';
+import { PluginManager } from './plugin-manager.js';
 
 interface RBushItem extends BoundingBox {
   element: SpatialElement;
@@ -25,15 +29,20 @@ export class SpatialEngine {
   private world: SpatialWorld | null = null;
   private transitionManager: TransitionManager;
   private lodManager: LODManager;
+  private zNavigationManager: ZNavigationManager;
+  private pluginManager: PluginManager;
   private eventListeners: Map<keyof EventMap, Function[]> = new Map();
   private frameStartTime = 0;
   private performanceMetrics: PerformanceMetrics;
+  private is3DEnabled = false;
 
   constructor(container: HTMLElement, options: SpatialEngineOptions = {}) {
     this.spatialIndex = new RBush();
+    this.is3DEnabled = options.enable3D ?? false;
     this.viewport = {
       x: options.initialViewport?.x ?? 0,
       y: options.initialViewport?.y ?? 0,
+      z: this.is3DEnabled ? (options.initialViewport?.z ?? 0) : undefined,
       zoom: options.initialViewport?.zoom ?? 1,
       width: options.initialViewport?.width ?? container.clientWidth,
       height: options.initialViewport?.height ?? container.clientHeight,
@@ -41,9 +50,21 @@ export class SpatialEngine {
 
     this.transitionManager = new TransitionManager();
     this.lodManager = new LODManager();
+    this.zNavigationManager = new ZNavigationManager();
+    this.pluginManager = new PluginManager(this);
     this.performanceMetrics = this.initializePerformanceMetrics();
 
+    // Configure Z-navigation bounds
+    if (this.is3DEnabled) {
+      this.zNavigationManager.setDepthBounds(
+        options.minDepth ?? -1000,
+        options.maxDepth ?? 1000
+      );
+    }
+
     this.initializeDeckGL(container, options);
+    this.setupEventForwarding();
+    this.pluginManager.initialize();
   }
 
   private initializePerformanceMetrics(): PerformanceMetrics {
@@ -138,11 +159,34 @@ export class SpatialEngine {
   private handleViewportChange(newViewport: Viewport): void {
     this.viewport = newViewport;
 
-    const visibleElements = this.getVisibleElements();
+    // Update Z navigation manager if 3D is enabled
+    if (this.is3DEnabled && newViewport.z !== undefined) {
+      // This would typically be driven by the ZNavigationManager,
+      // but we sync the viewport here for consistency
+    }
+
+    let visibleElements = this.getVisibleElements();
+    
+    // Apply Z-axis filtering if 3D is enabled
+    if (this.is3DEnabled) {
+      visibleElements = this.zNavigationManager.filterElementsByDepth(visibleElements);
+    }
+    
+    // Apply plugin behaviors
+    const behaviorContext = {
+      viewport: newViewport,
+      timestamp: performance.now(),
+      frameRate: this.performanceMetrics.rendering.frameRate,
+    };
+    visibleElements = this.pluginManager.applyBehaviors(visibleElements, behaviorContext);
+    
     const lodElements = this.lodManager.applyLOD(visibleElements, newViewport.zoom);
 
     this.updateLayers(lodElements);
     this.emit('viewportChange', newViewport);
+    
+    // Notify plugins
+    this.pluginManager.notifyViewportChange(newViewport);
   }
 
   private getVisibleElements(): SpatialElement[] {
@@ -320,6 +364,9 @@ export class SpatialEngine {
 
   private handleElementClick(element: SpatialElement): void {
     this.emit('elementClick', element);
+    
+    // Notify plugins of element interaction
+    this.pluginManager.notifyElementInteraction(element, 'click');
 
     if (element.data?.interactions) {
       this.processInteractions(element.data.interactions, element);
@@ -379,6 +426,83 @@ export class SpatialEngine {
     return { ...this.performanceMetrics };
   }
 
+  /**
+   * Z-axis Navigation Methods
+   */
+  
+  async navigateToZ(options: ZNavigationOptions): Promise<void> {
+    if (!this.is3DEnabled) {
+      console.warn('3D navigation is not enabled');
+      return;
+    }
+    
+    return this.zNavigationManager.navigateToZ({
+      ...options,
+      onProgress: (progress, currentZ) => {
+        // Update viewport with new Z position
+        this.viewport = { ...this.viewport, z: currentZ };
+        this.handleViewportChange(this.viewport);
+        options.onProgress?.(progress, currentZ);
+      },
+      onComplete: (finalZ) => {
+        this.emit('zNavigationEnd', { z: finalZ });
+        options.onComplete?.(finalZ);
+      },
+    });
+  }
+  
+  async diveDeeper(distance = 10, duration = 500): Promise<void> {
+    return this.zNavigationManager.diveDeeper(distance, duration);
+  }
+  
+  async emergeUp(distance = 10, duration = 500): Promise<void> {
+    return this.zNavigationManager.emergeUp(distance, duration);
+  }
+  
+  async resetToSurface(duration = 1000): Promise<void> {
+    return this.zNavigationManager.resetToSurface(duration);
+  }
+  
+  getCurrentZ(): number {
+    return this.zNavigationManager.getCurrentZ();
+  }
+  
+  /**
+   * Layer Management for 3D
+   */
+  
+  addSpatialLayer(layer: SpatialLayer): void {
+    this.zNavigationManager.addLayer(layer);
+  }
+  
+  removeSpatialLayer(zIndex: number): void {
+    this.zNavigationManager.removeLayer(zIndex);
+  }
+  
+  getSpatialLayer(zIndex: number): SpatialLayer | undefined {
+    return this.zNavigationManager.getLayer(zIndex);
+  }
+  
+  getAllSpatialLayers(): SpatialLayer[] {
+    return this.zNavigationManager.getAllLayers();
+  }
+  
+  /**
+   * Plugin Management
+   */
+  
+  getPluginManager(): PluginManager {
+    return this.pluginManager;
+  }
+  
+  getZNavigationManager(): ZNavigationManager {
+    return this.zNavigationManager;
+  }
+  
+  is3D(): boolean {
+    return this.is3DEnabled;
+  }
+
   private updatePerformanceMetrics(): void {
     const now = performance.now();
     const frameTime = now - this.frameStartTime;
@@ -393,6 +517,17 @@ export class SpatialEngine {
     }
 
     this.emit('performanceUpdate', this.performanceMetrics);
+  }
+
+  private setupEventForwarding(): void {
+    // Forward Z-navigation events
+    this.zNavigationManager.on('zNavigationStart', (data) => {
+      this.emit('zNavigationStart', data);
+    });
+    
+    this.zNavigationManager.on('zNavigationEnd', (data) => {
+      this.emit('zNavigationEnd', data);
+    });
   }
 
   on<K extends keyof EventMap>(event: K, listener: (data: EventMap[K]) => void): void {
@@ -421,6 +556,8 @@ export class SpatialEngine {
 
   destroy(): void {
     this.transitionManager.cancel();
+    this.zNavigationManager.destroy();
+    this.pluginManager.destroy();
     this.deck?.finalize();
     this.spatialIndex.clear();
     this.eventListeners.clear();
