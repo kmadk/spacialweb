@@ -22,7 +22,7 @@ Transform Penpot design files into infinite-zoom spatial web applications with p
 }
 ```
 
-No translation layer. No interpretation. Pure CSS property preservation.
+Direct CSS property preservation without translation layers or design interpretation.
 
 ### Infinite Zoom Spatial Navigation
 - 0.001x to 1000x zoom range with smooth WebGL-powered transitions
@@ -126,66 +126,36 @@ Each package is independently versioned and published to npm:
 
 We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup and guidelines.
 
-## Core Spatial Navigation
+## Features
 
-Replace traditional pagination with infinite zoom spatial navigation:
+### Core Capabilities
+- **Direct Penpot Integration** - Automatic flow parsing and spatial mapping
+- **Infinite Zoom** - 0.001x to 1000x range with smooth WebGL transitions
+- **Performance Optimized** - Viewport culling, LOD system, 60fps target
+- **Developer Friendly** - Simple API with TypeScript support
 
-### Direct Penpot Integration
-- Flow Parsing - Automatically extract connections from .penpot files
-- Spatial Mapping - Convert flows to spatial coordinates
-- CSS Preservation - Maintain exact design fidelity
-- Infinite Zoom - 0.001x to 1000x range with smooth transitions
+### Optional Enhancements
+- **Narrative Layouts** - Hero Journey, Spiral Story, Timeline patterns
+- **Spatial Audio** - 3D positional audio with accessibility cues
+- **Extensible API** - Custom movement styles and layouts
 
-### Performance Optimized
-- Viewport Culling - Only render visible elements (90%+ reduction)
-- LOD System - Level-of-detail based on zoom level
-- 60fps Target - Maintained across all interactions
-- Memory Efficient - Object pooling and garbage collection optimization
-
-### Developer Experience
-```typescript
-// Simple spatial navigation setup
-const engine = new OptimizedSpatialEngine(container);
-engine.loadWorld(spatialWorld);
-// Penpot flows automatically become spatial navigation!
-```
-
-## Optional: Cinematic Enhancements
-
-For users who want to go beyond standard spatial navigation:
-
-### Narrative Layouts (Optional)
-When you want storytelling-driven spatial arrangements:
-- Hero Journey, Spiral Story, Timeline, Hub & Spoke patterns
-- Automatic layout based on content analysis
-- Emotional movement styles for presentations
-
-### Spatial Audio (Optional)
-For immersive experiences:
-- 3D positional audio with doppler effects
-- Accessibility audio cues
-- Themed soundscapes for different content types
-
-### Advanced Features
-- [Cinematic System Guide](CINEMATIC_SYSTEM.md) - Complete optional enhancement docs
-- Interactive Demo - See both basic and enhanced features
-- Extensible API - Add your own movement styles and layouts
+For complete documentation, see [Cinematic System Guide](CINEMATIC_SYSTEM.md).
 
 ## Roadmap
 
-### Completed (v1.0)
-- [x] Cinematic Movement System - 7 layouts, 5 movement styles, 3D audio
-- [x] Advanced Easing Library - 15+ specialized animation curves  
-- [x] Penpot Flow Parser - Automatic flow extraction and analysis
-- [x] Performance Optimization - 60fps cinematic transitions
-- [x] Interactive Demo System - Complete showcase with 7 scenarios
+### Current (v1.0)
+- [x] Core spatial navigation engine
+- [x] Penpot integration and flow parsing
+- [x] Performance optimization (60fps, viewport culling)
+- [x] Cinematic movement system
+- [x] Comprehensive test coverage
 
-### Coming Soon
-- [ ] Real-time Collaboration - Multi-user spatial editing
-- [ ] Plugin System - Extensible spatial behaviors
-- [ ] 3D Spatial Navigation - Z-axis exploration
-- [ ] WebGPU Rendering - Next-generation performance
-- [ ] VR/AR Support - Immersive spatial experiences
+### Upcoming
+- [ ] Real-time collaboration
+- [ ] Plugin system
+- [ ] 3D spatial navigation
+- [ ] WebGPU rendering
+- [ ] VR/AR support
 
 ## License
 

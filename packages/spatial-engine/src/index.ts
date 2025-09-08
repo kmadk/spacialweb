@@ -9,10 +9,16 @@ export { SpatialEngine } from './spatial-engine.js';
 export { LODManager } from './lod-manager.js';
 export { TransitionManager } from './transition-manager.js';
 
+// 3D Navigation and Plugin System (NEW)
+export { ZNavigationManager } from './z-navigation-manager.js';
+export { PluginManager } from './plugin-manager.js';
+export { ZNavigationControls } from './controls/z-navigation-controls.js';
+
 // Core types
 export type {
   Viewport,
   Point,
+  Point3D,
   SpatialElement,
   SpatialWorld,
   SpatialRegion,
@@ -24,10 +30,16 @@ export type {
   EasingFunction,
   EventMap,
   BoundingBox,
+  // 3D Navigation types (NEW)
+  ZNavigationOptions,
+  SpatialLayer,
+  SpatialPlugin,
+  SpatialBehavior,
 } from './types.js';
 
 // Essential performance utilities (tree-shakeable)
 export { ViewportCuller } from './performance/viewport-culling.js';
+export { ViewportCulling3D } from './performance/viewport-culling-3d.js'; // NEW
 export { ObjectPool, PooledViewport, PooledBoundingBox } from './performance/object-pool.js';
 export { RenderScheduler } from './performance/render-scheduler.js';
 
