@@ -69,7 +69,7 @@ export class ReactGenerator {
     }
 
     for (const component of penpotFile.components) {
-      const componentCode = this.generateReusableComponent(component, options);
+      const componentCode = this.generateReusableComponent(component);
       componentFiles.push({
         path: `src/components/${this.sanitizeName(component.name)}.tsx`,
         content: componentCode,
@@ -122,7 +122,7 @@ ${this.generateElementsJSX(page.elements, 6)}
     </div>`;
   }
 
-  private generateReusableComponent(component: PenpotComponent, options: GenerationOptions): string {
+  private generateReusableComponent(component: PenpotComponent): string {
     const componentName = this.toPascalCase(component.name);
     const imports = this.generateImports(component.elements);
 

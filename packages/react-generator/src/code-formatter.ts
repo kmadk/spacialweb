@@ -11,7 +11,7 @@ export class CodeFormatter {
     }
   }
 
-  formatSync(code: string, type: 'typescript' | 'css' | 'json' | 'html' = 'typescript'): string {
+  formatSync(code: string): string {
     // Skip prettier formatting for now due to async-only API
     return this.basicFormat(code);
   }
@@ -61,7 +61,7 @@ export class CodeFormatter {
     }
   }
 
-  minify(code: string, type: 'typescript' | 'css' | 'json' = 'typescript'): string {
+  minify(code: string): string {
     try {
       return this.basicFormat(code);
     } catch (error) {
@@ -70,7 +70,7 @@ export class CodeFormatter {
     }
   }
 
-  validateSyntax(code: string, type: 'typescript' | 'css' | 'json' = 'typescript'): boolean {
+  validateSyntax(code: string): boolean {
     try {
       this.formatSync(code);
       return true;
