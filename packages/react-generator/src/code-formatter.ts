@@ -12,13 +12,8 @@ export class CodeFormatter {
   }
 
   formatSync(code: string, type: 'typescript' | 'css' | 'json' | 'html' = 'typescript'): string {
-    try {
-      const options = this.getFormatterOptions(type);
-      return prettier.formatSync ? prettier.formatSync(code, options) : code;
-    } catch (error) {
-      console.warn('Failed to format code:', error);
-      return code;
-    }
+    // Skip prettier formatting for now due to async-only API
+    return this.basicFormat(code);
   }
 
   private getFormatterOptions(type: string): prettier.Options {
@@ -77,11 +72,7 @@ export class CodeFormatter {
         trailingComma: 'none' as const,
       };
 
-      const formatted = prettier.formatSync ? prettier.formatSync(code, options) : code;
-      return formatted
-        .replace(/\s+/g, ' ')
-        .replace(/;\s/g, ';')
-        .trim();
+      return this.basicFormat(code);
     } catch (error) {
       console.warn('Failed to minify code:', error);
       return code;
@@ -158,5 +149,15 @@ export class CodeFormatter {
     });
 
     return [...usedImports, '', ...lines.filter(line => !line.startsWith('import') && line.trim() !== '')].join('\n');
+  }
+
+  private basicFormat(code: string): string {
+    return code
+      .replace(/\s+/g, ' ')
+      .replace(/;\s/g, '; ')
+      .replace(/,\s/g, ', ')
+      .replace(/{\s/g, '{ ')
+      .replace(/\s}/g, ' }')
+      .trim();
   }
 }

@@ -83,7 +83,7 @@ export class ReactGenerator {
   private generatePageComponent(page: PenpotPage, options: GenerationOptions): string {
     const componentName = this.toPascalCase(page.name);
     const spatialElements = this.convertToSpatialElements(page.elements);
-    const imports = this.generateImports(page.elements, options);
+    const imports = this.generateImports(page.elements);
 
     const templateData: TemplateData = {
       componentName,
@@ -124,7 +124,7 @@ ${this.generateElementsJSX(page.elements, 6)}
 
   private generateReusableComponent(component: PenpotComponent, options: GenerationOptions): string {
     const componentName = this.toPascalCase(component.name);
-    const imports = this.generateImports(component.elements, options);
+    const imports = this.generateImports(component.elements);
 
     const templateData: TemplateData = {
       componentName,
