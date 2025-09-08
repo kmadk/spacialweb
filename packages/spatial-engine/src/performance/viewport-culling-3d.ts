@@ -30,7 +30,7 @@ interface OcclusionInfo {
 
 export class ViewportCulling3D {
   private frustumCullDistance = 200; // Distance beyond which elements are culled
-  private occlusionTestDistance = 50; // Distance within which occlusion testing is performed
+  // private occlusionTestDistance = 50; // Distance within which occlusion testing is performed
   private lodDistanceThresholds = [20, 50, 100, 200]; // Distance thresholds for LOD levels
   
   // Occlusion testing grid for performance
@@ -99,7 +99,7 @@ export class ViewportCulling3D {
     }
     
     // Step 3: Occlusion culling for near elements
-    this.performOcclusionCulling(nearElements, viewerZ);
+    this.performOcclusionCulling(nearElements);
     
     // Step 4: Extract visible elements
     const visibleElements = nearElements
@@ -206,7 +206,7 @@ export class ViewportCulling3D {
   /**
    * Perform occlusion culling on near elements
    */
-  private performOcclusionCulling(elements: OcclusionInfo[], viewerZ: number): void {
+  private performOcclusionCulling(elements: OcclusionInfo[]): void {
     // Sort by distance from viewer (front to back)
     elements.sort((a, b) => a.distanceFromViewer - b.distanceFromViewer);
     

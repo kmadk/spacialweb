@@ -18,7 +18,11 @@ import { viewportPool, boundingBoxPool } from './performance/object-pool.js';
 import { globalRenderScheduler, type RenderTask } from './performance/render-scheduler.js';
 import { FlowChoreographer, type PenpotFlow, type CinematicSequence } from './cinematics/flow-choreographer.js';
 
-interface RBushItem extends BoundingBox {
+interface RBushItem {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
   element: SpatialElement;
 }
 
@@ -49,7 +53,7 @@ export class OptimizedSpatialEngine {
   // Optimization flags
   private enableIncrementalUpdates = true;
   private enableLayerCaching = true;
-  private enableAsyncProcessing = true;
+  // private enableAsyncProcessing = true;
 
   constructor(container: HTMLElement, options: SpatialEngineOptions = {}) {
     this.spatialIndex = new RBush();
@@ -110,7 +114,7 @@ export class OptimizedSpatialEngine {
         minZoom: options.minZoom ?? -10,
         maxZoom: options.maxZoom ?? 10,
       },
-      onViewStateChange: ({ viewState }) => {
+      onViewStateChange: ({ viewState }: { viewState: any }) => {
         this.handleViewportChange({
           x: viewState.longitude,
           y: viewState.latitude,
@@ -634,8 +638,8 @@ export class OptimizedSpatialEngine {
     }
 
     // Add cinematic effects support to the engine
-    const originalSetRenderEffect = this.setRenderEffect?.bind(this) || (() => {});
-    const originalHighlightElement = this.highlightElement?.bind(this) || (() => {});
+    const originalSetRenderEffect = (() => {}) as any;
+    const originalHighlightElement = (() => {}) as any;
     
     // Temporarily add these methods for the choreographer
     (this as any).setRenderEffect = (effect: string, value: number) => {
@@ -705,7 +709,7 @@ export class OptimizedSpatialEngine {
    * Apply cinematic effects through deck.gl
    */
   private applyCinematicEffect(effect: string, value: number): void {
-    const currentLayers = this.deck?.props.layers || [];
+    const currentLayers = (this.deck as any)?.layers || [];
     
     // Apply effect to all layers based on effect type
     switch (effect) {
@@ -747,12 +751,12 @@ export class OptimizedSpatialEngine {
     });
 
     // Add highlight layer temporarily
-    const currentLayers = this.deck?.props.layers || [];
+    const currentLayers = (this.deck as any)?.layers || [];
     this.deck?.setProps({ layers: [...currentLayers, highlightLayer] });
 
     // Remove highlight after duration
     setTimeout(() => {
-      const layersWithoutHighlight = (this.deck?.props.layers || [])
+      const layersWithoutHighlight = ((this.deck as any)?.layers || [])
         .filter((layer: any) => !layer.id?.startsWith(`highlight-${elementId}`));
       this.deck?.setProps({ layers: layersWithoutHighlight });
     }, options.duration || 1000);

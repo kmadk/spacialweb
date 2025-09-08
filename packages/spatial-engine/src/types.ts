@@ -95,6 +95,7 @@ export interface PerformanceMetrics {
     responseTime: number;
     clickAccuracy: number;
   };
+  scheduler?: any;
 }
 
 export interface SpatialEngineOptions {
@@ -165,4 +166,10 @@ export interface SpatialBehavior {
   name: string;
   apply(elements: SpatialElement[], context: any): SpatialElement[];
   shouldApply(context: any): boolean;
+}
+
+export interface EventMap {
+  viewportChange: { viewport: Viewport };
+  worldLoaded: { world: SpatialWorld };
+  flowsChoreographed: { flows: any[]; connections: any[] };
 }

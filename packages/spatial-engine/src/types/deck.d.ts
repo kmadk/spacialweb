@@ -34,4 +34,31 @@ declare module '@deck.gl/layers' {
     radiusMinPixels?: number;
     radiusMaxPixels?: number;
   }> {}
+
+  export class PolygonLayer<D = any> extends Layer<{
+    data: D[];
+    getPolygon: (d: D) => number[][];
+    getFillColor?: (d: D) => [number, number, number] | [number, number, number, number];
+    getLineColor?: (d: D) => [number, number, number] | [number, number, number, number];
+    getLineWidth?: (d: D) => number;
+    filled?: boolean;
+    stroked?: boolean;
+  }> {}
+
+  export class TextLayer<D = any> extends Layer<{
+    data: D[];
+    getPosition: (d: D) => [number, number] | [number, number, number];
+    getText: (d: D) => string;
+    getColor?: (d: D) => [number, number, number] | [number, number, number, number];
+    getSize?: (d: D) => number;
+    getAngle?: (d: D) => number;
+    fontFamily?: string;
+    fontWeight?: string;
+  }> {}
+
+  export class BitmapLayer<D = any> extends Layer<{
+    data?: D[];
+    image: string | ImageBitmap | HTMLImageElement;
+    bounds: [number, number, number, number];
+  }> {}
 }

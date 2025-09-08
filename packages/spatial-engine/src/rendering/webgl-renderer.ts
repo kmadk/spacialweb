@@ -6,21 +6,16 @@
 import type { SpatialElement, Viewport } from '../types.js';
 
 interface WebGLProgramWithMeta {
-  program: WebGLProgram;
+  program: WebGLProgramWithMeta;
   uniforms: Record<string, WebGLUniformLocation>;
   attributes: Record<string, number>;
 }
 
-interface WebGLProgram {
-  program: WebGLProgram;
-  uniforms: Record<string, WebGLUniformLocation>;
-  attributes: Record<string, number>;
-}
 
 interface RenderBatch {
   elements: SpatialElement[];
   texture?: WebGLTexture;
-  program: WebGLProgram;
+  program: WebGLProgramWithMeta;
   instanceCount: number;
 }
 

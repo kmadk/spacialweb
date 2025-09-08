@@ -68,7 +68,7 @@ export class MemoryProfiler {
     this.isMonitoring = true;
     this.takeSnapshot();
     
-    this.monitoringInterval = (typeof window !== 'undefined' ? window : global as any).setInterval(() => {
+    this.monitoringInterval = (typeof window !== 'undefined' ? window : (globalThis as any)).setInterval(() => {
       this.takeSnapshot();
     }, this.samplingInterval);
   }
@@ -237,8 +237,8 @@ export class MemoryProfiler {
   public forceGC(): void {
     if (typeof window !== 'undefined' && (window as any).gc) {
       (window as any).gc();
-    } else if (typeof global !== 'undefined' && (global as any).gc) {
-      (global as any).gc();
+    } else if (typeof globalThis !== 'undefined' && (globalThis as any).gc) {
+      (globalThis as any).gc();
     }
   }
 
