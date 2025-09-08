@@ -38,12 +38,11 @@
 
         .demo-container {
             position: absolute;
-            top: 80px;
+            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: #1a1a1a;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sidebar {
@@ -169,10 +168,6 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="title">🎬 Cinematic Spatial Navigation</div>
-        <div class="subtitle">Experience narrative-driven spatial transitions with Penpot flows</div>
-    </div>
 
     <div class="demo-container">
         <div class="sidebar">
@@ -183,10 +178,6 @@
                 <div class="scenario-description">Classic hero's journey with expanding spiral layout and dramatic transitions</div>
             </button>
             
-            <button class="scenario-button" data-scenario="Spiral Story">
-                🌀 Spiral Story
-                <div class="scenario-description">Golden ratio spiral layout with cinematic reveal transitions</div>
-            </button>
             
             <button class="scenario-button" data-scenario="Timeline">
                 📅 Timeline
@@ -676,7 +667,6 @@
         function getMovementTypeForScenario(scenario) {
             const movementMap = {
                 'Hero Journey': 'dramatic-zoom',
-                'Spiral Story': 'cinematic-reveal',
                 'Timeline': 'professional-focus',
                 'Hub and Spoke': 'playful-bounce',
                 'Exploration Grid': 'playful-bounce',
