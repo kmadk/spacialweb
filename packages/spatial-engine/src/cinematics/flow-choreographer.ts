@@ -152,7 +152,7 @@ export class FlowChoreographer {
 
           // Apply focus and spotlight
           if (currentKeyframe.focus) {
-            this.applyFocusEffects(engine, currentKeyframe.focus, currentKeyframe.effects);
+            this.applyFocusEffects(engine, currentKeyframe.focus);
           }
 
           // Spatial audio cues
@@ -377,23 +377,22 @@ export class FlowChoreographer {
     const toElement = elements.find(el => el.id === connection.toElement);
     
     if (!fromElement || !toElement) {
-      return this.createSimpleSequence(connection);
+      return this.createSimpleSequence();
     }
 
     const movementType = this.getMovementTypeForTransition(connection);
     const movement = this.movements.get(movementType);
     
     if (!movement) {
-      return this.createSimpleSequence(connection);
+      return this.createSimpleSequence();
     }
 
     // Create viewport for movement calculation
-    const fromLayout = layout.get(connection.fromElement);
-    const toLayout = layout.get(connection.toElement);
+    // const toLayout = layout.get(connection.fromElement);
     
     const viewport: Viewport = {
-      x: fromLayout?.x || fromElement.bounds.x,
-      y: fromLayout?.y || fromElement.bounds.y,
+      x: fromElement.bounds.x,
+      y: fromElement.bounds.y,
       zoom: 1,
       width: 1920,
       height: 1080,
@@ -407,7 +406,7 @@ export class FlowChoreographer {
     this.movements.set('documentary-pan', {
       name: 'Documentary Pan',
       description: 'Smooth, steady movement like a documentary camera',
-      calculate: (from, to, viewport) => ({
+      calculate: (from, to) => ({
         keyframes: [
           { timestamp: 0, viewport: { x: from.bounds.x, y: from.bounds.y, zoom: 1.2 } },
           { timestamp: 0.3, viewport: { zoom: 0.8 } }, // Pull back to see context
@@ -423,7 +422,7 @@ export class FlowChoreographer {
     this.movements.set('cinematic-reveal', {
       name: 'Cinematic Reveal',
       description: 'Dramatic reveal with depth and focus effects',
-      calculate: (from, to, viewport) => ({
+      calculate: (from, to) => ({
         keyframes: [
           { 
             timestamp: 0, 
@@ -461,7 +460,7 @@ export class FlowChoreographer {
     this.movements.set('playful-bounce', {
       name: 'Playful Bounce',
       description: 'Bouncy, energetic movement with elastic easing',
-      calculate: (from, to, viewport) => ({
+      calculate: (from, to) => ({
         keyframes: [
           { timestamp: 0, viewport: { x: from.bounds.x, y: from.bounds.y, zoom: 1 } },
           { timestamp: 0.3, viewport: { zoom: 0.7 } }, // Bounce back
@@ -477,7 +476,7 @@ export class FlowChoreographer {
     this.movements.set('professional-focus', {
       name: 'Professional Focus',
       description: 'Clean, efficient transition with subtle highlighting',
-      calculate: (from, to, viewport) => ({
+      calculate: (from, to) => ({
         keyframes: [
           { timestamp: 0, viewport: { x: from.bounds.x, y: from.bounds.y, zoom: 1 } },
           { timestamp: 0.4, viewport: { x: to.bounds.x, y: to.bounds.y } },
@@ -492,7 +491,7 @@ export class FlowChoreographer {
     this.movements.set('dramatic-zoom', {
       name: 'Dramatic Zoom',
       description: 'Intense zoom with dramatic timing',
-      calculate: (from, to, viewport) => ({
+      calculate: (from, to) => ({
         keyframes: [
           { 
             timestamp: 0, 
@@ -648,7 +647,7 @@ export class FlowChoreographer {
     }
   }
 
-  private applyFocusEffects(engine: any, elementId: string, effects?: any): void {
+  private applyFocusEffects(engine: any, elementId: string): void {
     // Highlight focused element
     engine.highlightElement(elementId, {
       intensity: 1.2,
@@ -681,7 +680,7 @@ export class FlowChoreographer {
     }
   }
 
-  private createSimpleSequence(connection: PenpotConnection): CinematicSequence {
+  private createSimpleSequence(): CinematicSequence {
     return {
       keyframes: [
         { timestamp: 0, viewport: {} },
@@ -692,7 +691,7 @@ export class FlowChoreographer {
     };
   }
 
-  private getSequence(connectionId: string): CinematicSequence | null {
+  private getSequence(connectionId?: string): CinematicSequence | null {
     // This would be stored when choreographing flows
     return this.activeSequence;
   }

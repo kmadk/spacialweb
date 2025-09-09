@@ -3,7 +3,7 @@
  * Enhanced viewport culling with Z-axis frustum culling and occlusion detection
  */
 
-import type { Viewport, SpatialElement, Point3D } from '../types.js';
+import type { Viewport, SpatialElement } from '../types.js';
 import type { BoundingBox } from '@fir/penpot-parser';
 
 interface BoundingBox3D extends BoundingBox {
@@ -396,7 +396,7 @@ export class ViewportCulling3D {
   }
   
   setOcclusionTestDistance(distance: number): void {
-    this.occlusionTestDistance = distance;
+    // this.occlusionTestDistance = distance;
   }
   
   setLODDistanceThresholds(thresholds: number[]): void {

@@ -42,7 +42,7 @@ export class ZNavigationControls {
   private depthSlider: HTMLInputElement | null = null;
   private depthDisplay: HTMLElement | null = null;
   private layerList: HTMLElement | null = null;
-  private controlPanel: HTMLElement | null = null;
+  // private controlPanel: HTMLElement | null = null;
 
   constructor(engine: SpatialEngine, options: ZControlsOptions = {}) {
     this.engine = engine;
@@ -177,7 +177,7 @@ export class ZNavigationControls {
       this.addEventListener(this.depthSlider, 'input', (e) => {
         const target = e.target as HTMLInputElement;
         const newZ = parseFloat(target.value);
-        this.navigateToZ(newZ, { duration: 100 });
+        this.navigateToZ(newZ, {});
       });
       
       depthSection.appendChild(depthLabel);
@@ -235,7 +235,7 @@ export class ZNavigationControls {
       transition: background-color 0.2s;
     `;
     
-    const hoverStyle = 'background: #0056CC;';
+    // const hoverStyle = 'background: #0056CC;';
     
     // Surface button
     const surfaceBtn = document.createElement('button');
@@ -436,7 +436,7 @@ export class ZNavigationControls {
         const deltaY = currentY - lastTouchY;
         const zDelta = deltaY * this.options.touchSensitivity;
         
-        this.navigateToZ(touchStartZ + zDelta, { duration: 50 });
+        this.navigateToZ(touchStartZ + zDelta, {});
         event.preventDefault();
       }
     }, { passive: false });
@@ -559,7 +559,7 @@ export class ZNavigationControls {
       });
       
       this.addEventListener(layerElement, 'click', () => {
-        this.navigateToZ(layer.zIndex, { duration: 800, easing: 'easeInOutCubic' });
+        this.navigateToZ(layer.zIndex, { easing: 'easeInOutCubic' });
       });
       
       this.layerList!.appendChild(layerElement);

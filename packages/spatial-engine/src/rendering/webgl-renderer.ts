@@ -197,49 +197,7 @@ export class WebGLRenderer {
       }
     `;
 
-    // GPU culling compute shader (if available)
-    // const cullingComputeShader = `#version 310 es // Unused compute shader
-      layout(local_size_x = 64) in;
-      
-      layout(std430, binding = 0) readonly buffer InputElements {
-        float elements[];
-      };
-      
-      layout(std430, binding = 1) writeonly buffer OutputElements {
-        float visibleElements[];
-      };
-      
-      uniform vec4 u_frustum; // left, top, right, bottom
-      uniform float u_minSize;
-      
-      void main() {
-        uint index = gl_GlobalInvocationID.x;
-        if (index >= elements.length() / 8u) return;
-        
-        uint elemOffset = index * 8u;
-        float x = elements[elemOffset];
-        float y = elements[elemOffset + 1u];
-        float width = elements[elemOffset + 2u];
-        float height = elements[elemOffset + 3u];
-        
-        // Frustum culling
-        if (x + width < u_frustum.x || x > u_frustum.z ||
-            y + height < u_frustum.y || y > u_frustum.w) {
-          return; // Outside frustum
-        }
-        
-        // Size culling
-        if (width < u_minSize && height < u_minSize) {
-          return; // Too small to render
-        }
-        
-        // Copy element to output
-        uint outOffset = atomicAdd(visibleElements[0], 1u) * 8u + 4u;
-        for (uint i = 0u; i < 8u; i++) {
-          visibleElements[outOffset + i] = elements[elemOffset + i];
-        }
-      }
-    `;
+    // GPU culling compute shader (if available) - removed due to syntax issues
 
     this.programs.set('instanced', this.createProgram(instancedVertexShader, instancedFragmentShader));
     

@@ -1,5 +1,5 @@
 import { Deck } from '@deck.gl/core';
-import { PolygonLayer, TextLayer, BitmapLayer } from '@deck.gl/layers';
+import { PolygonLayer, TextLayer } from '@deck.gl/layers';
 import RBush from 'rbush';
 import type {
   Viewport,
@@ -18,7 +18,11 @@ import { TransitionManager } from './transition-manager.js';
 import { ZNavigationManager } from './z-navigation-manager.js';
 import { PluginManager } from './plugin-manager.js';
 
-interface RBushItem extends BoundingBox {
+interface RBushItem {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
   element: SpatialElement;
 }
 
@@ -107,7 +111,7 @@ export class SpatialEngine {
         minZoom: options.minZoom ?? -10,
         maxZoom: options.maxZoom ?? 10,
       },
-      onViewStateChange: ({ viewState }) => {
+      onViewStateChange: ({ viewState }: { viewState: any }) => {
         this.handleViewportChange({
           x: viewState.longitude,
           y: viewState.latitude,
@@ -278,7 +282,6 @@ export class SpatialEngine {
     if (elementsByType.rectangle?.length > 0) {
       layers.push(
         new PolygonLayer({
-          id: 'rectangles',
           data: elementsByType.rectangle,
           getPolygon: (d: SpatialElement) => this.getRectanglePolygon(d.bounds),
           getFillColor: (d: SpatialElement) => this.getElementColor(d),
@@ -293,13 +296,12 @@ export class SpatialEngine {
     if (elementsByType.text?.length > 0) {
       layers.push(
         new TextLayer({
-          id: 'text-elements',
           data: elementsByType.text,
           getPosition: (d: SpatialElement) => [d.bounds.x, d.bounds.y],
           getText: (d: SpatialElement) => d.data?.text || d.id,
-          getSize: (d: SpatialElement) => this.getTextSize(d),
+          getSize: this.getTextSize.bind(this),
           getColor: (d: SpatialElement) => this.getTextColor(d),
-          getAngle: 0,
+          getAngle: () => 0,
           getTextAnchor: 'start',
           getAlignmentBaseline: 'top',
           pickable: true,
@@ -521,11 +523,11 @@ export class SpatialEngine {
 
   private setupEventForwarding(): void {
     // Forward Z-navigation events
-    this.zNavigationManager.on('zNavigationStart', (data) => {
+    this.zNavigationManager.on('zNavigationStart', (data: any) => {
       this.emit('zNavigationStart', data);
     });
     
-    this.zNavigationManager.on('zNavigationEnd', (data) => {
+    this.zNavigationManager.on('zNavigationEnd', (data: any) => {
       this.emit('zNavigationEnd', data);
     });
   }

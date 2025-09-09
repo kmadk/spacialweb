@@ -21,7 +21,9 @@ export class TransitionManager {
     const config = {
       duration: options.duration ?? 800,
       easing: options.easing ?? 'easeInOutCubic' as EasingFunction,
-      ...options,
+      type: options.type ?? 'pan' as const,
+      onProgress: options.onProgress,
+      onComplete: options.onComplete,
     };
 
     return new Promise((resolve, reject) => {
@@ -44,7 +46,7 @@ export class TransitionManager {
     config: Required<TransitionOptions>,
     onUpdate: (viewport: Viewport) => void,
     onComplete: () => void,
-    onError: (error: Error) => void
+    onError?: (error: Error) => void
   ): Animation {
     const startTime = performance.now();
     let animationFrame: number;

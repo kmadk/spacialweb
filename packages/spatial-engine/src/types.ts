@@ -1,4 +1,4 @@
-import type { Layer } from '@deck.gl/core';
+// import type { Layer } from '@deck.gl/core';
 import type { BoundingBox as PenpotBoundingBox } from '@fir/penpot-parser';
 
 export type BoundingBox = PenpotBoundingBox;
@@ -121,7 +121,7 @@ export type EasingFunction =
   | 'easeOutBounce';    // Engaging for layer emergence
 
 export interface EventMap {
-  viewportChange: Viewport;
+  viewportChange: { viewport: Viewport };
   elementClick: SpatialElement;
   elementHover: SpatialElement;
   customAction: { action: any; element: SpatialElement };

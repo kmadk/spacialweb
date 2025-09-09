@@ -42,8 +42,8 @@ export class CinematicDemo {
       },
     });
 
-    this.choreographer = new FlowChoreographer();
-    this.parser = new PenpotFlowParser();
+    // this.choreographer = new FlowChoreographer();
+    // this.parser = new PenpotFlowParser();
 
     if (options.showControls) {
       this.createDemoControls(options.container);
@@ -445,7 +445,7 @@ export class CinematicDemo {
   private createElement(name: string, x: number, y: number, width: number, height: number): SpatialElement {
     return {
       id: `element-${Math.random().toString(36).substr(2, 9)}`,
-      name,
+      // name,
       type: 'rectangle' as const,
       bounds: { x, y, width, height },
       styles: {

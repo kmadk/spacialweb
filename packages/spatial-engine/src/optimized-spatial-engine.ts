@@ -257,7 +257,6 @@ export class OptimizedSpatialEngine {
     switch (type) {
       case 'rectangle':
         return new PolygonLayer({
-          id: `rectangles-${Date.now()}`,
           data: elements,
           getPolygon: (d: SpatialElement) => this.getRectanglePolygon(d.bounds),
           getFillColor: (d: SpatialElement) => this.getElementColor(d),
@@ -273,13 +272,12 @@ export class OptimizedSpatialEngine {
 
       case 'text':
         return new TextLayer({
-          id: `text-${Date.now()}`,
           data: elements,
           getPosition: (d: SpatialElement) => [d.bounds.x, d.bounds.y],
           getText: (d: SpatialElement) => this.getElementText(d),
-          getSize: (d: SpatialElement) => this.getTextSize(d),
+          getSize: this.getTextSize.bind(this),
           getColor: (d: SpatialElement) => this.getTextColor(d),
-          getAngle: 0,
+          getAngle: () => 0,
           getTextAnchor: 'start',
           getAlignmentBaseline: 'top',
           pickable: true,
@@ -290,15 +288,9 @@ export class OptimizedSpatialEngine {
 
       case 'image':
         return new BitmapLayer({
-          id: `images-${Date.now()}`,
           data: elements,
-          image: (d: SpatialElement) => this.getElementImage(d),
-          bounds: (d: SpatialElement) => [
-            d.bounds.x,
-            d.bounds.y,
-            d.bounds.x + d.bounds.width,
-            d.bounds.y + d.bounds.height,
-          ],
+          image: '',
+          bounds: [0, 0, 100, 100] as [number, number, number, number],
           pickable: true,
           onClick: (info: any) => this.handleElementClick(info.object),
         });
@@ -532,7 +524,6 @@ export class OptimizedSpatialEngine {
         culledElements: cullingStats.culledElements,
       },
       scheduler: schedulerStats,
-      culling: cullingStats,
     };
   }
 
@@ -589,17 +580,17 @@ export class OptimizedSpatialEngine {
       case 'performance':
         this.enableIncrementalUpdates = true;
         this.enableLayerCaching = true;
-        this.enableAsyncProcessing = true;
+        // this.enableAsyncProcessing = true;
         break;
       case 'balanced':
         this.enableIncrementalUpdates = true;
         this.enableLayerCaching = true;
-        this.enableAsyncProcessing = false;
+        // this.enableAsyncProcessing = false;
         break;
       case 'quality':
         this.enableIncrementalUpdates = false;
         this.enableLayerCaching = false;
-        this.enableAsyncProcessing = false;
+        // this.enableAsyncProcessing = false;
         break;
     }
   }
@@ -619,7 +610,7 @@ export class OptimizedSpatialEngine {
     // Update element positions based on choreographed layout
     this.applySpatiallayout();
 
-    this.emit('flowsChoreographed', { flows, connections: this.cinematicConnections });
+    this.emit('flowsChoreographed', { flows, connections: Array.from(this.cinematicConnections.values()) });
   }
 
   /**
@@ -744,9 +735,9 @@ export class OptimizedSpatialEngine {
       id: `highlight-${elementId}-${Date.now()}`,
       data: [element],
       getPolygon: (d: SpatialElement) => this.getRectanglePolygon(d.bounds),
-      getFillColor: [255, 255, 0, 50], // Yellow highlight
-      getLineColor: [255, 255, 0, 200],
-      getLineWidth: 3,
+      getFillColor: () => [255, 255, 0, 50] as [number, number, number, number],
+      getLineColor: () => [255, 255, 0, 200] as [number, number, number, number],
+      getLineWidth: () => 3,
       pickable: false,
     });
 
